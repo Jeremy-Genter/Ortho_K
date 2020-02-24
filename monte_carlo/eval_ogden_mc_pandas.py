@@ -29,18 +29,34 @@ rejected = pd.DataFrame(np.zeros([1, len(column_name)]), columns=column_name)
 rejected = pd.DataFrame.drop(rejected, 0)
 i = 0
 j = 0
+## paper values
 for ii in range(len(results)):
-    results.loc[ii, 'error'] = (results.loc[ii, 'thickness_central 1d']/9+1)**2 + (results.loc[ii, 'power_eye 1d']/2.25+0.2)**2
+    results.loc[ii, 'error'] = (results.loc[ii, 'thickness_central 1d']/9+1)**2 + (results.loc[ii, 'power_eye 1d']/2.25+0.6)**2
 for ii in range(len(results)):
-    if results['thickness_central 1d'][i] > -4.5 or results['power_eye 1d'][i] > -1.3 or results['contact time -2 D'][i]\
-            > 1*60 or results['contact time -2 D'][i] < 0.15*60 or results['keratometry 8h'][i] > -0.5 or\
-            results['keratometry 8h'][i] < -2.35:
+    if results['thickness_central 1d'][i] > -4.5 or results['power_eye 1d'][i] > -1.125 or results['power_eye 1d'][i] < -1.8 \
+            or results['contact time -2 D'][i] > 1*60 or results['contact time -2 D'][i] < 0.15*60 or \
+            results['keratometry 8h'][i] > -0.5 or results['keratometry 8h'][i] < -2.35:
         rejected = pd.DataFrame.append(rejected, results.iloc[j])
         results = pd.DataFrame.drop(results, i)
     else:
         j +=1
 
     i += 1
+
+## patient 1 and 2 values
+# for ii in range(len(results)):
+#     results.loc[ii, 'error'] = (results.loc[ii, 'thickness_central 1d']/9+1)**2 + (results.loc[ii, 'power_eye 1d']/2.25+0.17)**2
+# for ii in range(len(results)):
+#     if results['thickness_central 1d'][i] > -4.5 or results['power_eye 1d'][i] > -0.17*2.25 or results['power_eye 1d'][i] < -0.75*2.25\
+#             or results['contact time -2 D'][i] > 1*60 or results['contact time -2 D'][i] < 0.15*60 or \
+#             results['keratometry 8h'][i] > -0.5 or results['keratometry 8h'][i] < -2.35:
+#         rejected = pd.DataFrame.append(rejected, results.iloc[j])
+#         results = pd.DataFrame.drop(results, i)
+#     else:
+#         j +=1
+#
+#     i += 1
+
 
 plot_res = pd.DataFrame.drop(results, columns=['Unnamed: 0']) #'keratometry 8h',
 plot_rej = pd.DataFrame.drop(rejected, columns=['Unnamed: 0'])
@@ -119,6 +135,6 @@ for i in range(np.shape(axes)[0]):
 
 print('eyelid pressure:', kruskal(rejected['eyelid-pressure'].values, results['eyelid-pressure'].values))
 print('E epi t-test:', kruskal(rejected['Eepi'].values, results['Eepi'].values))
-print('k epi t-test:', kruskal(rejected['Kepi'].values, results['Kepi'].values))
-print('k stroma t-test:', kruskal(rejected['Kstroma'].values, results['Kstroma'].values))
-print(results.loc[results['error'].argmin(), :])
+print('k epi t-test:', kruskal(np.log10(rejected['Kepi'].values), np.log10(results['Kepi'].values)))
+print('k stroma t-test:', kruskal(np.log10(rejected['Kstroma'].values), np.log10(results['Kstroma'].values)))
+print('accepted bin: \n', results.loc[results['error'].argmin(), :], '\n rejected bin: \n', rejected.loc[rejected['error'].argmin(), :] )
