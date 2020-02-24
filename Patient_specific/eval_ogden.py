@@ -139,15 +139,15 @@ for k in dir:
         ax00.set_ylabel('refractive power change [D]', Fontsize=12)
         # plt.ylim([-3, 0])
         plt.xticks((np.arange(0, 20, 2)))
+        ax3.scatter([kk_], thickness_central[kk_] * 1e3, label='central epithelium'+label_name[kk_])
+        ax3.scatter([kk_], thickness_midperi[kk_] * 1e3, label='mid-peripheral epithelium'+label_name[kk_])
+        ax3.set_ylabel('epithelial thickness [$\mu m$]', Fontsize=12)
+        leg = ax3.legend(loc='lower right', fontsize=9)
+        plt.xticks((np.arange(0, 4, 0.25)))
     kk_ += 1
 
 ax00.plot([0, 20], [-1, -1], color='black', lw=1)
 ax00.plot([0, 20], [-0.6, -0.6], color='black', lw=1)
 ax00.plot([16, 16], [0, -5], color='black', lw=1)
 
-ax3.boxplot(thickness_central*1e3)
-ax3.boxplot(thickness_midperi*1e3)
-ax3.set_xlabel(['central epithelium, mid-peripheral epithelium'], Fontsize=12)
-ax3.set_ylabel('epithelial thickness [$\mu m$]', Fontsize=12)
-leg = ax3.legend(loc='lower right', fontsize=9)
-plt.xticks((np.arange(0, 4, 0.25)))
+
