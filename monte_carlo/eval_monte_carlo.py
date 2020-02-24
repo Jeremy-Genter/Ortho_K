@@ -7,7 +7,7 @@ from copy import deepcopy
 from my_functions import *
 
 fig00, ax00 = plt.subplots()
-fig00.suptitle('Refractive Correction: lid_p range 0.21 - 0.23\,$kPa$', fontsize=16)
+fig00.suptitle('Refractive Correction: $p_{lid}$ range 0.21 - 0.23 $kPa$', fontsize=16)
 os.chdir('simulations-mc')
 dir_list = os.listdir(os.getcwd())
 os.chdir('..')

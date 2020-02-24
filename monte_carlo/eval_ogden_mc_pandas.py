@@ -125,7 +125,7 @@ for i in range(np.shape(axes)[0]):
     for j in range(np.shape(axes)[1]):
         if i < j:
             axes[i, j].set_visible(False)
-plt.suptitle('$p_{lid} = 0.22+/-0.05 kPa$', size=20)
+plt.suptitle('$p_{lid} = 0.22+/-0.011 kPa$', size=20)
 
 axes = pd.plotting.scatter_matrix(plot_rej, diagonal='kde')
 for i in range(np.shape(axes)[0]):

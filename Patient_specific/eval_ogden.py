@@ -9,24 +9,11 @@ from my_functions import *
 nodes_disp_file = ['anterior_surface.dat']
 
 fig00, ax00 = plt.subplots()
-fig00.suptitle('Refractive Correction: change in $E_{epi}$', fontsize=16)
-fig10, ax10 = plt.subplots()
-fig10.suptitle('Refractive Correction: change in $k_{epi}$', fontsize=16)
-fig20, ax20 = plt.subplots()
-fig20.suptitle('Refractive Correction: change in $k_{stroma}$', fontsize=16)
-
-fig0c, ax0c = plt.subplots()
-fig0c.suptitle('Contact Diameter', fontsize=16)
-
-fig1c, ax1c = plt.subplots()
-fig1c.suptitle('Contact Diameter', fontsize=16)
-fig2c, ax2c = plt.subplots()
-fig2c.suptitle('Contact Diameter', fontsize=16)
+fig00.suptitle('Refractive Correction: Patient 1', fontsize=16)
 
 fig3, ax3 = plt.subplots()
 fig3.suptitle('Change in Epithelial Thickness', fontsize=16)
-fig4, ax4 = plt.subplots()
-fig4.suptitle('Change in Epithelial Thickness', fontsize=16)
+
 
 section = ['<Nodes name="Cornea"', '<NodeSet name="anterior_surface">', '<NodeSet name="anterior_surface_stroma">',
            '<NodeSet name="posterior_surface">']
@@ -35,9 +22,11 @@ E_epi = np.asarray([0.8, 0.8])
 k_epi = np.round(np.logspace(-6.5, -5.2, 5), 8)
 k_stroma = np.round(np.logspace(-3.4, -2.3, 5), 5)
 l_name = np.ndarray.tolist(E_epi) + np.ndarray.tolist(k_epi) + np.ndarray.tolist(k_stroma)
+l_name = ['E: 0.86 kPa; $k_{epi}$: 6e-6 $\dfrac{mm^4}{Ns}$; k_stroma:$k_{stroma}$: 4e-3 $\dfrac{mm^4}{Ns}$ left', 'right',
+          'E: 0.8 kPa; $k_{epi}$: 8e-7 $\dfrac{mm^4}{Ns}$; k_stroma:$k_{stroma}$: 1.7e-3 $\dfrac{mm^4}{Ns}$ left', 'right']
 # l_name = ['fixed IOP', 'fluid cavity']
 # l_name = np.ndarray.tolist(E_epi) + ['$p_{eyelid}=1\,kPa$ $E_{epi} = 4$', 'sealed Boundary']
-dir = [0, 1]  # [3, 7]#
+dir = [0, 1, 2, 3]  # [3, 7]#
 thickness_central = np.zeros([len(dir), 1])
 thickness_midperi = np.zeros([len(dir), 1])
 kk_ = 0
@@ -125,20 +114,6 @@ for k in dir:
             temp[:, 1] = -(temp[:, 1] - np.max(temp[:, 1], axis=0))
             x_revolved[jj * np.int(np.ceil((index_15-5) / skip)):(jj + 1) * np.int(np.ceil((index_15-5) / skip)),
             j * 3:(j + 1) * 3] = np.concatenate([temp[:, 2], temp[:, 0], temp[:, 1]], axis=1)
-    contact_diameter = np.zeros([5, 1])
-    t_contact = np.zeros([5, 1])
-    kk = 1
-    for j in range(len(t)):
-        if j == np.abs(t - 664).argmin() or j == np.abs(t - 1864).argmin() or j == np.abs(t - 3664).argmin() or j == np.abs(t - 28864).argmin():
-            t_contact[kk, 0] = t[j]/60
-            r_con = np.zeros([80, 1])
-            for x_direction in range(60, 140):
-                x_temp = x[15:x_direction+1, 3*j:3*j+3]
-                r_con = circ_fit(x_temp)[0]
-                if r_con < 8.0:
-                    break
-            contact_diameter[kk, 0] = 2*x[x_direction, 0]
-            kk += 1
 
     # calculate Radius and power of the eye
     n = 1.3375
@@ -157,74 +132,22 @@ for k in dir:
     # plot radius eye
     # ax1 = plt.subplot(211)
     if k < 10:
-        label_name = str(l_name[kk_]) + '$\,kPa$'
+        label_name = str(l_name[kk_])
         ax00.plot(t[30:] / 3600, power_eye[30:] - (n - 1) / 0.0076, label=label_name)
         leg = ax00.legend(loc='lower right', fontsize=9)
         ax00.set_xlabel('time [h]', Fontsize=12)
         ax00.set_ylabel('refractive power change [D]', Fontsize=12)
         # plt.ylim([-3, 0])
         plt.xticks((np.arange(0, 20, 2)))
-        ax0c.scatter(t_contact, contact_diameter, marker='x', label=label_name)
-        leg = ax0c.legend(loc='lower right', fontsize=9)
-        plt.xticks((np.arange(0, 480, 60)))
-        ax0c.set_xlabel('time [min]', Fontsize=12)
-        ax0c.set_ylabel('contact diameter [mm]', Fontsize=12)
-    elif k < 20:
-        label_name = str(l_name[kk_]) + '$\,\dfrac{mm^{4}}{Ns}$'
-        ax10.plot(t[30:] / 3600, power_eye[30:] - (n - 1) / 0.0076, label=label_name)
-        leg = ax10.legend(loc='lower right', fontsize=9)
-        ax10.set_xlabel('time [h]', Fontsize=12)
-        ax10.set_ylabel('refractive power change [D]', Fontsize=12)
-        # plt.ylim([-3, 0])
-        plt.xticks((np.arange(0, 20, 2)))
-        ax1c.scatter(t_contact, contact_diameter, marker='x', label=label_name)
-        leg = ax1c.legend(loc='lower right', fontsize=9)
-        plt.xticks((np.arange(0, 480, 60)))
-        ax1c.set_xlabel('time [min]', Fontsize=12)
-        ax1c.set_ylabel('contact diameter [mm]', Fontsize=12)
-    elif k < 30:
-        label_name = str(l_name[kk_]) + '$\,\dfrac{mm^{4}}{Ns}$'
-        ax20.plot(t[30:] / 3600, power_eye[30:] - (n - 1) / 0.0076, label=label_name)
-        leg = ax20.legend(loc='lower right', fontsize=9)
-        ax20.set_xlabel('time [h]', Fontsize=12)
-        ax20.set_ylabel('refractive power change [D]', Fontsize=12)
-        # plt.ylim([-3, 0])
-        plt.xticks((np.arange(0, 20, 2)))
-        ax2c.scatter(t_contact, contact_diameter, marker='x', label=label_name)
-        leg = ax2c.legend(loc='lower right', fontsize=9)
-        plt.xticks((np.arange(0, 480, 60)))
-        ax2c.set_xlabel('time [min]', Fontsize=12)
-        ax2c.set_ylabel('contact diameter [mm]', Fontsize=12)
     kk_ += 1
-ax00.plot([0, 20], [-1.74, -1.74], color='black', lw=1)
-ax00.plot([16, 16], [0, -3], color='black', lw=1)
-#ax00.plot([24+16, 24+16], [0, -3], color='black', lw=1)
-#ax00.plot([2*24+16, 2*24+16], [0, -3], color='black', lw=1)
-#ax00.plot([3*24+16, 3*24+16], [0, -3], color='black', lw=1)
-ax10.plot([0, 20], [-1.74, -1.74], color='black', lw=1)
-ax10.plot([16, 16], [0, -3], color='black', lw=1)
-ax20.plot([0, 20], [-1.74, -1.74], color='black', lw=1)
-ax20.plot([16, 16], [0, -3], color='black', lw=1)
 
-if np.sum(np.asarray(dir) < 10):
-    ax3.scatter(E_epi, thickness_central[0:5], label='central thickness')
-    ax3.scatter(E_epi, thickness_midperi[0:5], label='mid-peripheral thickness')
-    # ax3.scatter(np.ndarray.tolist(E_epi)+[4], thickness_central[0:5], label='central thickness')
-    # ax3.scatter(np.ndarray.tolist(E_epi)+[4], thickness_midperi[0:5], label='mid-peripheral thickness')
-    ax3.set_xlabel('Young\'s modulus [kPa]', Fontsize=12)
-    ax3.set_ylabel('epithelial thickness [$\mu m$]', Fontsize=12)
-    leg = ax3.legend(loc='lower right', fontsize=9)
-    plt.xticks((np.arange(0, 4, 0.25)))
-if np.sum(np.asarray(dir) > 10):
-    ax4.scatter(k_epi, thickness_central[5:10], label='central thickness var in $k_{epi}$')
-    ax4.scatter(k_stroma, thickness_central[10:15], label='central thickness var in $k_{stroma}$')
-    ax4.scatter(k_epi, thickness_midperi[5:10], label='mid-peripheral thickness var in $k_{epi}$')
-    ax4.scatter(k_stroma, thickness_midperi[10:15], label='mid-peripheral thickness var in $k_{stroma}$')
-    ax4.set_xscale('log')
-    ax4.set_xticks([1e-7, 1e-6, 1e-5, 1e-4, 1e-3, 1e-2])
-    # plt.ticklabel_format(style='sci', axis='x')
-    ax4.set_xlabel('permeability [$\dfrac{mm^{4}}{Ns}$]', Fontsize=12)
-    ax4.set_ylabel('epithelial thickness [$\mu m$]', Fontsize=12)
-    leg = ax4.legend(loc='lower right', fontsize=9)
+ax00.plot([0, 20], [-1, -1], color='black', lw=1)
+ax00.plot([0, 20], [-0.6, -0.6], color='black', lw=1)
+ax00.plot([16, 16], [0, -5], color='black', lw=1)
 
-plt.show()
+ax3.boxplot(thickness_central*1e3)
+ax3.boxplot(thickness_midperi*1e3)
+ax3.set_xlabel(['central epithelium, mid-peripheral epithelium'], Fontsize=12)
+ax3.set_ylabel('epithelial thickness [$\mu m$]', Fontsize=12)
+leg = ax3.legend(loc='lower right', fontsize=9)
+plt.xticks((np.arange(0, 4, 0.25)))
