@@ -22,8 +22,8 @@ E_epi = np.asarray([0.8, 0.8])
 k_epi = np.round(np.logspace(-6.5, -5.2, 5), 8)
 k_stroma = np.round(np.logspace(-3.4, -2.3, 5), 5)
 l_name = np.ndarray.tolist(E_epi) + np.ndarray.tolist(k_epi) + np.ndarray.tolist(k_stroma)
-l_name = ['E: 0.86 kPa; $k_{epi}$: 6e-6 $\dfrac{mm^4}{Ns}$; k_stroma:$k_{stroma}$: 4e-3 $\dfrac{mm^4}{Ns}$ left', 'right',
-          'E: 0.8 kPa; $k_{epi}$: 8e-7 $\dfrac{mm^4}{Ns}$; k_stroma:$k_{stroma}$: 1.7e-3 $\dfrac{mm^4}{Ns}$ left', 'right']
+l_name = ['E: 0.8 kPa; $k_{epi}$: 8e-7 $\dfrac{mm^4}{Ns}$; k_stroma:$k_{stroma}$: 1.7e-3 $\dfrac{mm^4}{Ns}$ left', 'right',
+          'E: 0.86 kPa; $k_{epi}$: 6e-6 $\dfrac{mm^4}{Ns}$; k_stroma:$k_{stroma}$: 4e-3 $\dfrac{mm^4}{Ns}$ left', 'right']
 # l_name = ['fixed IOP', 'fluid cavity']
 # l_name = np.ndarray.tolist(E_epi) + ['$p_{eyelid}=1\,kPa$ $E_{epi} = 4$', 'sealed Boundary']
 dir = [0, 1, 2, 3]  # [3, 7]#
@@ -133,7 +133,8 @@ for k in dir:
     # ax1 = plt.subplot(211)
     if k < 10:
         label_name = str(l_name[kk_])
-        ax00.plot(t[30:] / 3600, power_eye[30:] - (n - 1) / 0.0076, label=label_name)
+        index_prestr = np.argmin(np.abs(t - 64))
+        ax00.plot(t[index_prestr:] / 3600, power_eye[index_prestr:] - power_eye[index_prestr], label=label_name)
         leg = ax00.legend(loc='lower right', fontsize=9)
         ax00.set_xlabel('time [h]', Fontsize=12)
         ax00.set_ylabel('refractive power change [D]', Fontsize=12)

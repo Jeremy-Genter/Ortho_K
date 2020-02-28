@@ -5,6 +5,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 from copy import deepcopy
+import scipy.stats as stats
 from scipy.stats import kruskal
 from my_functions import *
 
@@ -59,7 +60,9 @@ for ii in range(len(results)):
 
 
 plot_res = pd.DataFrame.drop(results, columns=['Unnamed: 0']) #'keratometry 8h',
-plot_rej = pd.DataFrame.drop(rejected, columns=['Unnamed: 0'])
+total_res = pd.concat([results, rejected])
+plot_rej = pd.DataFrame.drop(total_res, columns=['Unnamed: 0'])
+
 
 plot_res = pd.DataFrame.rename(plot_res, columns={'eyelid-pressure': "$lid_p$", "thickness_central 1d": "$ECT_{16h}$",
                                                   "thickness_central 4d": "$ECT_{4d}$", "thickness_midperi 1d": "$EMT_{16h}$",
@@ -92,6 +95,7 @@ plt.figure()
 plt.suptitle('$p_{lid} = 0.18+/-0.05 kPa$', size=20)
 sns.heatmap(plot_res_0.corr(method='spearman'), annot=True, mask=mask)  # , ax=ax1)
 axes = pd.plotting.scatter_matrix(plot_res_0, diagonal='kde')  # , ax=ax2)
+plt.suptitle('$p_{lid} = 0.18+/-0.05 kPa$', size=20)
 #plt.suptitle('$p_{lid} = 0.18+/-0.05 kPa$', size=20)
 for i in range(np.shape(axes)[0]):
     for j in range(np.shape(axes)[1]):
@@ -128,6 +132,7 @@ for i in range(np.shape(axes)[0]):
 plt.suptitle('$p_{lid} = 0.22+/-0.011 kPa$', size=20)
 
 axes = pd.plotting.scatter_matrix(plot_rej, diagonal='kde')
+plt.suptitle('Unfiltered Monte Carlo', size=20)
 for i in range(np.shape(axes)[0]):
     for j in range(np.shape(axes)[1]):
         if i < j:
@@ -138,3 +143,17 @@ print('E epi t-test:', kruskal(rejected['Eepi'].values, results['Eepi'].values))
 print('k epi t-test:', kruskal(np.log10(rejected['Kepi'].values), np.log10(results['Kepi'].values)))
 print('k stroma t-test:', kruskal(np.log10(rejected['Kstroma'].values), np.log10(results['Kstroma'].values)))
 print('accepted bin: \n', results.loc[results['error'].argmin(), :], '\n rejected bin: \n', rejected.loc[rejected['error'].argmin(), :] )
+
+E_range = np.linspace(0.75, 1.5, 200)
+k_epi_range = np.logspace(-6.5, -5.5, 200)
+k_stroma_range = np.logspace(-3.5, -2.2, 200)
+
+nparam_density_E = stats.kde.gaussian_kde(plot_res_2['$E_{epi}$'].values.ravel())
+nparam_density_E = nparam_density_E(E_range).argmax()
+nparam_density_k_epi = stats.kde.gaussian_kde(plot_res_2['$k_{epi}$'].values.ravel())
+nparam_density_k_epi = nparam_density_k_epi(k_epi_range).argmax()
+nparam_density_k_stroma = stats.kde.gaussian_kde(plot_res_2['$k_{stroma}$'].values.ravel())
+nparam_density_k_stroma = nparam_density_k_stroma(k_stroma_range).argmax()
+
+print('E_mean:', E_range[nparam_density_E], '\nk_epi_mean:', k_epi_range[nparam_density_k_epi], '\nk_stroma_mean:',
+      k_stroma_range[nparam_density_k_stroma])

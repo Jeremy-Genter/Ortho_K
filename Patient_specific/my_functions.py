@@ -338,7 +338,7 @@ def keratometry(self, mode='biconic'):
 
         # Double check the correct option if more than two options available
         if len(phi) == 2:
-            if (phi[0] < 0) or (phi[0] >= 90):
+            if (phi[0] < 0) or (phi[0] >= np.pi/2):
                 Rx = Rx[1]
                 Ry = Ry[1]
                 phi = phi[1]
