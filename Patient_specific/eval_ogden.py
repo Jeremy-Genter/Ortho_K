@@ -100,8 +100,8 @@ for k in dir:
         x_zyl_R_y = x_zyl[np.nonzero(x_zyl[:, 1] < -1.57)[0], :]
         if i == 0:
             index_1dot5 = np.abs(x_zyl[:, 0] - 1.5).argmin()
-            index_1dot5_x = np.abs(x_zyl_R_x[:, 0] - 1.5).argmin()
-            index_1dot5_y = np.abs(x_zyl_R_y[:, 0] - 1.5).argmin()
+            index_1dot5_x = np.abs(x_zyl_R_x[:, 0] - 1).argmin()
+            index_1dot5_y = np.abs(x_zyl_R_y[:, 0] - 1).argmin()
             x_1dot5 = np.zeros([index_1dot5, len(t)*3])
             x_1dot5_x = np.zeros([index_1dot5_x, len(t) * 3])
             x_1dot5_y = np.zeros([index_1dot5_y, len(t) * 3])

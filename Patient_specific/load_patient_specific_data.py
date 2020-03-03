@@ -114,16 +114,19 @@ for loop in range(1):
             data_an_l = np.delete(data_an_l, j, axis=0)
             continue
         j += 1
+    j = 0
     while j < len(data_an_r[:, 0]):
         if np.sum(np.isnan(data_an_r[j, :])) > 0:
             data_an_r = np.delete(data_an_r, j, axis=0)
             continue
         j += 1
+    j = 0
     while j < len(data_pos_l[:, 0]):
         if np.sum(np.isnan(data_pos_l[j, :])) > 0:
-            data_an_r = np.delete(data_pos_l, j, axis=0)
+            data_pos_l = np.delete(data_pos_l, j, axis=0)
             continue
         j += 1
+    j = 0
     while j < len(data_pos_r[:, 0]):
         if np.sum(np.isnan(data_pos_r[j, :])) > 0:
             data_pos_r = np.delete(data_pos_r, j, axis=0)
