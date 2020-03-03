@@ -4,6 +4,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 from copy import deepcopy
 from my_functions import *
+from mpl_toolkits import mplot3d
 
 
 nodes_disp_file = ['anterior_surface.dat']
@@ -22,11 +23,10 @@ E_epi = np.asarray([0.8, 0.8])
 k_epi = np.round(np.logspace(-6.5, -5.2, 5), 8)
 k_stroma = np.round(np.logspace(-3.4, -2.3, 5), 5)
 l_name = np.ndarray.tolist(E_epi) + np.ndarray.tolist(k_epi) + np.ndarray.tolist(k_stroma)
-l_name = ['E: 0.8 kPa; $k_{epi}$: 8e-7 $\dfrac{mm^4}{Ns}$; k_stroma:$k_{stroma}$: 1.7e-3 $\dfrac{mm^4}{Ns}$ left', 'right',
-          'E: 0.86 kPa; $k_{epi}$: 6e-6 $\dfrac{mm^4}{Ns}$; k_stroma:$k_{stroma}$: 4e-3 $\dfrac{mm^4}{Ns}$ left', 'right']
+l_name = ['E: 1.5 kPa; $k_{epi}$: 7.5e-6 $\dfrac{mm^4}{Ns}$; k_stroma:$k_{stroma}$: 2.66e-3 $\dfrac{mm^4}{Ns}$ left']
 # l_name = ['fixed IOP', 'fluid cavity']
 # l_name = np.ndarray.tolist(E_epi) + ['$p_{eyelid}=1\,kPa$ $E_{epi} = 4$', 'sealed Boundary']
-dir = [0, 1, 2, 3]  # [3, 7]#
+dir = [0]
 thickness_central = np.zeros([len(dir), 1])
 thickness_midperi = np.zeros([len(dir), 1])
 kk_ = 0
@@ -92,16 +92,46 @@ for k in dir:
     thickness_midperi_temp_con = x[np.abs(x[:, iii_control*3]-3).argmin(), iii_control*3:(iii_control + 1) * 3]\
                                  - x_an_str[np.abs(x_an_str[:, iii_control*3]-2.97).argmin(), iii_control*3:(iii_control + 1) * 3]
     thickness_midperi[kk_] = np.linalg.norm(thickness_midperi_temp)-np.linalg.norm(thickness_midperi_temp_con)
+    for i in range(len(t)):
+        r_temp, phi_temp = cart2pol(x[:, i*3], x[:, i*3+1])
+        x_zyl = np.concatenate((r_temp.reshape(-1, 1), phi_temp.reshape(-1, 1), x[:, i*3+2].reshape(-1, 1)), axis=1)
+        x_zyl = np.array(sorted(x_zyl, key=lambda x_column: x_column[0]))
+        x_zyl_R_x = x_zyl[np.nonzero(x_zyl[:, 1] > -0.001)[0], :]
+        x_zyl_R_y = x_zyl[np.nonzero(x_zyl[:, 1] < -1.57)[0], :]
+        if i == 0:
+            index_1dot5 = np.abs(x_zyl[:, 0] - 1.5).argmin()
+            index_1dot5_x = np.abs(x_zyl_R_x[:, 0] - 1.5).argmin()
+            index_1dot5_y = np.abs(x_zyl_R_y[:, 0] - 1.5).argmin()
+            x_1dot5 = np.zeros([index_1dot5, len(t)*3])
+            x_1dot5_x = np.zeros([index_1dot5_x, len(t) * 3])
+            x_1dot5_y = np.zeros([index_1dot5_y, len(t) * 3])
+        z_offset = x_zyl[:, 2].min()
+        x_zyl[:, 2] = x_zyl[:, 2] - z_offset
+        x_temp, y_temp = pol2cart(x_zyl[:index_1dot5, 0], x_zyl[:index_1dot5, 1])
+        x_1dot5[:, i * 3:i * 3 + 3] = np.concatenate(
+            (x_temp.reshape(-1, 1), y_temp.reshape(-1, 1), x_zyl[:index_1dot5, 2].reshape(-1, 1)), axis=1)
 
-    x = np.array(sorted(x, key=lambda x_column: x_column[0]))
+        z_offset = x_zyl_R_x[:, 2].min()
+        x_zyl_R_x[:, 2] = x_zyl_R_x[:, 2] - z_offset
+        x_temp, y_temp = pol2cart(x_zyl_R_x[:index_1dot5_x, 0], x_zyl_R_x[:index_1dot5_x, 1])
+        x_1dot5_x[:, i * 3:i * 3 + 3] = np.concatenate(
+            (x_temp.reshape(-1, 1), y_temp.reshape(-1, 1), x_zyl_R_x[:index_1dot5_x, 2].reshape(-1, 1)), axis=1)
 
-    # revovle for spherical/biconical fit
+        z_offset = x_zyl_R_y[:, 2].min()
+        x_zyl_R_y[:, 2] = x_zyl_R_y[:, 2] - z_offset
+        x_temp, y_temp = pol2cart(x_zyl_R_y[:index_1dot5_y, 0], x_zyl_R_y[:index_1dot5_y, 1])
+        x_1dot5_y[:, i * 3:i * 3 + 3] = np.concatenate(
+            (x_temp.reshape(-1, 1), y_temp.reshape(-1, 1), x_zyl_R_y[:index_1dot5_y, 2].reshape(-1, 1)), axis=1)
+
+    ## revovle for spherical/biconical fit
     rot_angle = 5 / 180 * np.pi
     slices = int(2 * np.pi / rot_angle)
     skip = 5  # at least one
-    index_15 = (np.abs(x[:, 0] - 1.5)).argmin()
-    x_revolved = np.zeros([np.int(np.ceil((index_15-5) / skip)) * slices, 3 * len(t)])
-    contact_diameter = np.zeros([4, 1])
+    index_15_x = (np.abs(x_1dot5_x[:, 0] - 1.5)).argmin()
+    index_15_y = (np.abs(x_1dot5_y[:, 0] - 1.5)).argmin()
+    x_revolved_x = np.zeros([np.int(np.ceil((index_15_x-5) / skip)) * slices, 3 * len(t)])
+    x_revolved_y = np.zeros([np.int(np.ceil((index_15_y - 5) / skip)) * slices, 3 * len(t)])
+
     kk = 0
     for jj in range(slices):
         R_y = np.matrix(
@@ -109,32 +139,62 @@ for k in dir:
              [0, 1, 0],
              [-np.round(np.sin(jj * rot_angle), decimals=6), 0, np.round(np.cos(jj * rot_angle), decimals=6)]])
         for j in range(len(t)):
-            # biconic fitting describes surface in function of z; turn coordinate system accordingly
-            temp = np.transpose(np.dot(R_y, np.transpose(x[5:index_15:skip, j * 3:(j + 1) * 3])))
-            temp[:, 1] = -(temp[:, 1] - np.max(temp[:, 1], axis=0))
-            x_revolved[jj * np.int(np.ceil((index_15-5) / skip)):(jj + 1) * np.int(np.ceil((index_15-5) / skip)),
-            j * 3:(j + 1) * 3] = np.concatenate([temp[:, 2], temp[:, 0], temp[:, 1]], axis=1)
+            temp = np.transpose(np.dot(R_y, np.transpose(x_1dot5_x[5:index_15_x:skip, j * 3:(j + 1) * 3])))
+            x_revolved_x[
+            jj * np.int(np.ceil((index_15_x - 5) / skip)):(jj + 1) * np.int(np.ceil((index_15_x - 5) / skip)),
+            j * 3:(j + 1) * 3] = temp
+            temp = np.transpose(np.dot(R_y, np.transpose(x_1dot5_y[5:index_15_y:skip, j * 3:(j + 1) * 3])))
+            x_revolved_y[
+            jj * np.int(np.ceil((index_15_y - 5) / skip)):(jj + 1) * np.int(np.ceil((index_15_y - 5) / skip)),
+            j * 3:(j + 1) * 3] = temp
 
     # calculate Radius and power of the eye
     n = 1.3375
-    R_n = np.zeros(np.array([len(t), 1]))
-    R_ny = np.zeros(np.array([len(t), 1]))
-    power_eye = np.zeros(np.array([len(t), 1]))
-    R = np.zeros(np.array([len(t), 1]))
-    for j in range(int(np.float(len(t)))):
-        pos = x_revolved[:, j * 3:(j + 1) * 3]
+    R_n = np.full([len(t), 1], np.nan)
+    R_n_x = np.full([len(t), 1], np.nan)
+    R_n_y = np.full([len(t), 1], np.nan)
+    power_eye = np.full([len(t), 1], np.nan)
+    power_eye_x = np.full([len(t), 1], np.nan)
+    power_eye_y = np.full([len(t), 1], np.nan)
+    index_prestr = np.argmin(np.abs(t - 64))
+    for j in range(index_prestr, (len(t)), 2):
+        pos = x_1dot5[5:, j * 3:(j + 1) * 3]
         r = sphere_fit(pos)
-        # r = biconic_fitting(pos)
         R_n[j] = r[0]
-        # R_ny[j] = r[1]
-        # R[j] = (R_n[j] + R_ny[j])/2
+        # pos_2 = deepcopy(pos)
+        # pos_2[:, 1] = -pos_2[:, 1]
+        # pos = np.concatenate((pos, pos_2), axis=0)
+        # pos_2 = deepcopy(pos)
+        # pos_2[:, 0] = -pos_2[:, 0]
+        # pos = np.concatenate((pos, pos_2), axis=0)
+        # fig = plt.figure()
+        # ax = plt.axes(projection='3d')
+        # ax.scatter3D(pos[:, 0], pos[:, 1], pos[:, 2], c=pos[:, 2])
+        pos_x = x_revolved_x[5:, j * 3:(j + 1) * 3]
+        pos_y = x_revolved_y[5:, j * 3:(j + 1) * 3]
+        r_x = sphere_fit(pos_x)
+        r_y = sphere_fit(pos_y)
+        R_n_x[j] = r_x[0]
+        R_n_y[j] = r_y[0]
         power_eye[j] = (n - 1) / (R_n[j] * 1e-3)
+        power_eye_x[j] = (n - 1) / (R_n_x[j] * 1e-3)
+        power_eye_y[j] = (n - 1) / (R_n_y[j] * 1e-3)
     # plot radius eye
     # ax1 = plt.subplot(211)
+    t_plot =  t[~np.isnan(power_eye).any(axis=1)]
+    power_eye = power_eye[~np.isnan(power_eye).any(axis=1)]
+    power_eye_x = power_eye_x[~np.isnan(power_eye_x).any(axis=1)]
+    power_eye_y = power_eye_y[~np.isnan(power_eye_y).any(axis=1)]
+    R_n = R_n[~np.isnan(R_n).any(axis=1)]
+    R_n_x = R_n_x[~np.isnan(R_n_x).any(axis=1)]
+    R_n_y = R_n_y[~np.isnan(R_n_y).any(axis=1)]
+
     if k < 10:
         label_name = str(l_name[kk_])
-        index_prestr = np.argmin(np.abs(t - 64))
-        ax00.plot(t[index_prestr:] / 3600, power_eye[index_prestr:] - power_eye[index_prestr], label=label_name)
+
+        ax00.plot(t_plot/3600, power_eye - power_eye[0], label=label_name)
+        ax00.plot(t_plot/3600, power_eye_x - power_eye_x[0], label=label_name+'R_x')
+        ax00.plot(t_plot/3600, power_eye_y - power_eye_y[0], label=label_name+'R_y')
         leg = ax00.legend(loc='lower right', fontsize=9)
         ax00.set_xlabel('time [h]', Fontsize=12)
         ax00.set_ylabel('refractive power change [D]', Fontsize=12)
@@ -147,8 +207,10 @@ for k in dir:
         plt.xticks((np.arange(0, 4, 0.25)))
     kk_ += 1
 
-ax00.plot([0, 20], [-1, -1], color='black', lw=1)
-ax00.plot([0, 20], [-0.6, -0.6], color='black', lw=1)
+ax00.plot([0, 20], [-1.86, -1.86], lw=1, label='R_x measurment')
+ax00.plot([0, 20], [-0.15, -0.15], lw=1, label='R_y measurment')
+ax00.plot([0, 20], [-1, -1], lw=1, label='R_{mean} measurment')
 ax00.plot([16, 16], [0, -5], color='black', lw=1)
+leg = ax00.legend(loc='lower right', fontsize=9)
 
 
