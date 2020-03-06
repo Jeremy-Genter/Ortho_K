@@ -247,15 +247,32 @@ def f_sphere(init, *data):
     x = data[0, :]
     y = data[1, :]
     z = data[2, :]
-    return (-init[0]**2 + x**2 + y**2 + (z-init[1])**2)**2
+    return (-init[0]**2 + (x-init[1])**2 + (y-init[2])**2 + (z-init[3])**2)**2  # (-init[0]**2 + x**2 + y**2 + (z-init[1])**2)**2
 
 
 def sphere_fit(data):
     x = np.reshape(data[:, 0], [len(data[:, 0]), 1])
     y = np.reshape(data[:, 1], [len(data[:, 0]), 1])
     z = np.reshape(data[:, 2], [len(data[:, 0]), 1])
-    init = np.array([7.6, 0])
+    init = np.array([7.6, 0, 0, 0])
     res = optimize.least_squares(f_sphere, init, args=np.array([x, y, z]))
+    return res.x
+
+
+def f_ellipsoid(init, *data):
+    data = np.array(data[0:3])[:, :, 0]
+    x = data[0, :]
+    y = data[1, :]
+    z = data[2, :]
+    return (-1 + (x-init[3])**2/init[0]**2 + (y-init[4])**2/init[1]**2  + (z-init[5])**2)**2/init[2]**2
+
+
+def ellipsoid_fit(data):
+    x = np.reshape(data[:, 0], [len(data[:, 0]), 1])
+    y = np.reshape(data[:, 1], [len(data[:, 0]), 1])
+    z = np.reshape(data[:, 2], [len(data[:, 0]), 1])
+    init = np.array([7.6, 7.6, 7.6, 0, 0, 0])
+    res = optimize.least_squares(f_ellipsoid, init, args=np.array([x, y, z]))
     return res.x
 
 

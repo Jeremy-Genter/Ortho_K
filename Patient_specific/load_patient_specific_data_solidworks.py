@@ -105,8 +105,6 @@ for loop in range(4):
             data_pos_r = np.delete(data_pos_r, j, axis=0)
             continue
         j += 1
-    data_pos_l[:, 2] = data_pos_l[:, 2] - (data_pos_l[:256, 2]).min() + thickness_l[0, 0]*1e-3
-    data_pos_r[:, 2] = data_pos_r[:, 2] - (data_pos_r[:256, 2]).min() + thickness_r[0, 0]*1e-3
 
     if loop == 0:
         np.savetxt('anterior__surf_l_P1_pre', data_an_l[255:, :])
