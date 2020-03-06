@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 from scipy.optimize import fsolve
 from my_functions import *
 from copy import deepcopy
+from mpl_toolkits import mplot3d
 
 folder_patient_1_pre = 'Patient_1/PRE/'
 folder_patient_1_post = 'Patient_1/POST/'
@@ -43,10 +44,12 @@ for loop in range(4):
         #pos_surf_l[i, :] = np.asarray(p_data_l['CornealThickness [um]'][i + 64].split(';'))[:-1].astype(float)[:-1]
         #pos_surf_r[i, :] = np.asarray(p_data_r['CornealThickness [um]'][i + 64].split(';'))[:-1].astype(float)[:-1]
 
+    thickness_l[thickness_l < -5] = np.nan
     pos_surf_l = an_surf_l + thickness_l*1e-3
     pos_surf_l[pos_surf_l < -5] = np.nan
     pos_surf_l[0, :] = pos_surf_l[0, 0]
 
+    thickness_r[thickness_r < -5] = np.nan
     pos_surf_r = an_surf_r + thickness_r*1e-3
     pos_surf_r[pos_surf_r < -5] = np.nan
     pos_surf_r[0, :] = pos_surf_r[0, 0]
@@ -54,6 +57,10 @@ for loop in range(4):
     an_surf_l[an_surf_l < -5] = np.nan
     an_surf_l[0, :] = np.nanmean(an_surf_l[0, :])
     an_surf_l[-1, :] = np.nanmean(an_surf_l[-1, :])
+
+    an_surf_r[an_surf_r < -5] = np.nan
+    an_surf_r[0, :] = np.nanmean(an_surf_r[0, :])
+    an_surf_r[-1, :] = np.nanmean(an_surf_r[-1, :])
 
 
     theta = np.linspace(0, 2*np.pi, 256)
@@ -94,8 +101,8 @@ for loop in range(4):
             data_pos_r = np.delete(data_pos_r, j, axis=0)
             continue
         j += 1
-    data_pos_l[:, 2] = data_pos_l[:, 2] - (data_pos_l[:256, 2]).min()
-    data_pos_r[:, 2] = data_pos_r[:, 2] - (data_pos_r[:256, 2]).min()
+    data_pos_l[:, 2] = data_pos_l[:, 2] - (data_pos_l[:256, 2]).min() + thickness_l[0, 0]*1e-3
+    data_pos_r[:, 2] = data_pos_r[:, 2] - (data_pos_r[:256, 2]).min() + thickness_r[0, 0]*1e-3
 
     if loop == 0:
         np.savetxt('anterior__surf_l_P1_pre', data_an_l[255:, :])
@@ -117,6 +124,16 @@ for loop in range(4):
         np.savetxt('anterior__surf_r_P2_post', data_an_r[255:, :])
         np.savetxt('posterior_surf_l_P2_post', data_pos_l[255:, :])
         np.savetxt('posterior_surf_r_P2_post', data_pos_r[255:, :])
+
+    fig = plt.figure()
+    ax = plt.axes(projection='3d')
+    ax.scatter3D(data_an_l[:, 0], data_an_l[:, 1], data_an_l[:, 2], c=data_an_l[:, 2])
+    ax.scatter3D(data_pos_l[:, 0], data_pos_l[:, 1], data_pos_l[:, 2], c=data_pos_l[:, 2])
+    fig = plt.figure()
+    ax = plt.axes(projection='3d')
+    ax.scatter3D(data_an_r[:, 0], data_an_r[:, 1], data_an_r[:, 2], c=data_an_r[:, 2])
+    ax.scatter3D(data_pos_r[:, 0], data_pos_r[:, 1], data_pos_r[:, 2], c=data_pos_r[:, 2])
+
 
 
 
