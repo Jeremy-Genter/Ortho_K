@@ -78,6 +78,10 @@ for loop in range(4):
     data_pos_l[:, 2] = np.reshape(pos_surf_l, (-1, 1))[:, 0]
     data_pos_r = deepcopy(data_an_l)
     data_pos_r[:, 2] = np.reshape(pos_surf_r, (-1, 1))[:, 0]
+    data_thickness_l = deepcopy(data_an_l)
+    data_thickness_l[:, 2] = np.reshape(thickness_l, (-1, 1))[:, 0]
+    data_thickness_r = deepcopy(data_an_r)
+    data_thickness_r[:, 2] = np.reshape(thickness_r, (-1, 1))[:, 0]
     while j < len(data_an_l[:, 0]):
         if np.sum(np.isnan(data_an_l[j, :])) > 0:
             data_an_l = np.delete(data_an_l, j, axis=0)
@@ -109,21 +113,29 @@ for loop in range(4):
         np.savetxt('anterior__surf_r_P1_pre', data_an_r[255:, :])
         np.savetxt('posterior_surf_l_P1_pre', data_pos_l[255:, :])
         np.savetxt('posterior_surf_r_P1_pre', data_pos_r[255:, :])
+        np.savetxt('thickness_l_P1_pre', data_thickness_l[255:, :])
+        np.savetxt('thickness_r_P1_pre', data_thickness_r[255:, :])
     elif loop == 1:
         np.savetxt('anterior__surf_l_P1_post', data_an_l[255:, :])
         np.savetxt('anterior__surf_r_P1_post', data_an_r[255:, :])
         np.savetxt('posterior_surf_l_P1_post', data_pos_l[255:, :])
         np.savetxt('posterior_surf_r_P1_post', data_pos_r[255:, :])
+        np.savetxt('thickness_l_P1_post', data_thickness_l[255:, :])
+        np.savetxt('thickness_r_P1_post', data_thickness_r[255:, :])
     elif loop == 2:
         np.savetxt('anterior__surf_l_P2_pre', data_an_l[255:, :])
         np.savetxt('anterior__surf_r_P2_pre', data_an_r[255:, :])
         np.savetxt('posterior_surf_l_P2_pre', data_pos_l[255:, :])
         np.savetxt('posterior_surf_r_P2_pre', data_pos_r[255:, :])
+        np.savetxt('thickness_l_P2_pre', data_thickness_l[255:, :])
+        np.savetxt('thickness_r_P2_pre', data_thickness_r[255:, :])
     elif loop == 3:
         np.savetxt('anterior__surf_l_P2_post', data_an_l[255:, :])
         np.savetxt('anterior__surf_r_P2_post', data_an_r[255:, :])
         np.savetxt('posterior_surf_l_P2_post', data_pos_l[255:, :])
         np.savetxt('posterior_surf_r_P2_post', data_pos_r[255:, :])
+        np.savetxt('thickness_l_P2_post', data_thickness_l[255:, :])
+        np.savetxt('thickness_r_P2_post', data_thickness_r[255:, :])
 
     fig = plt.figure()
     ax = plt.axes(projection='3d')
