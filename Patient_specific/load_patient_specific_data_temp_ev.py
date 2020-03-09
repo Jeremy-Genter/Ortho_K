@@ -54,16 +54,18 @@ for loop in range(6):
         grid_x, grid_y = pol2cart(rho_new, phi_new)
 
         ref_power = np.full((grid_x.shape), np.nan)
-        for i in range(ref_power.shape[0]):
-            for ii in range(3, ref_power.shape[1]-3):
-                temp = np.zeros([7, 2])
-                temp[:, 0] = rho_new[i, ii-3:ii+4].reshape((-1, 1))[:, 0]
-                temp[:, -1] = griddata(points, values, (grid_x[i, ii-3:ii+4], grid_y[i, ii-3:ii+4]),
-                                       method='cubic')[:, 0]
-                if np.isnan(temp[:, -1]).any() == False:
-                    ref_power[i, ii] = (n-1)/(circ2_fit(temp)[0]*1e-3)
-                #else:
-                    #print(temp[:,-1])
+        R_map = np.full((grid_x.shape), np.nan)
+        # for i in range(ref_power.shape[0]):
+        #     for ii in range(3, ref_power.shape[1]-3):
+        #         temp = np.zeros([7, 2])
+        #         temp[:, 0] = rho_new[i, ii-3:ii+4].reshape((-1, 1))[:, 0]
+        #         temp[:, -1] = griddata(points, values, (grid_x[i, ii-3:ii+4], grid_y[i, ii-3:ii+4]),
+        #                                method='cubic')[:, 0]
+        #         if np.isnan(temp[:, -1]).any() == False:
+        #             R_map[i, ii] = circ2_fit(temp)[0]
+        #             ref_power[i, ii] = (n-1)/(R_map[i, ii]*1e-3)
+        # index_mean_R = np.where(rho_new < 1.5)
+        # R[loop, loop_2] = np.nanmedian(R_map[index_mean_R])
 
         data_an = np.zeros([len(index_sim_ker[0]), 3])
         data_an[:, 0] = np.reshape(x[index_sim_ker], (-1, 1))[:, 0]
@@ -100,17 +102,18 @@ for loop in range(6):
             j += 1
 
 
-        #R_temp = keratometry(data_an)  # , mode='sphere')
-        #R_temp = keratometry(data_an, mode='sphere')
-        # R_x[loop, loop_2] = R_temp[3]['Rx']
-        # R_y[loop, loop_2] = R_temp[3]['Ry']
+        R_temp = keratometry(data_an)  # , mode='sphere')
+        # R_temp = keratometry(data_an, mode='sphere')
+        R_x[loop, loop_2] = R_temp[3]['Rx']
+        R_y[loop, loop_2] = R_temp[3]['Ry']
+        R[loop, loop_2] = (R_x[loop, loop_2] + R_y[loop, loop_2])/2
 
-        R[loop, loop_2] = sphere_fit(data_an)[0]
+        # R[loop, loop_2] = sphere_fit(data_an)[0]
 
-        #R_temp = ellipsoid_fit(data_an)
-        #R[loop, loop_2] = (R_temp[0] + R_temp[1])/2
-        #R_x[loop, loop_2] = R_temp[0]
-        #R_y[loop, loop_2] = R_temp[1]
+        # R_temp = ellipsoid_fit(data_an)
+        # R[loop, loop_2] = (R_temp[0] + R_temp[1])/2
+        # R_x[loop, loop_2] = R_temp[0]
+        # R_y[loop, loop_2] = R_temp[1]
 
         power_eye[loop, loop_2] = (n - 1) / (R[loop, loop_2] * 1e-3)
         #power_eye_x[loop, loop_2] = (n - 1) / (R_x[loop, loop_2] * 1e-3)
@@ -171,8 +174,8 @@ p = n/(r*1e-3)
 
 for i in range(2):
     axs.plot(t, power_eye[:, i]-power_eye[0, i], label=l_name[i] + 'R', marker='+')
-    #axs.plot(t, power_eye_x[:, i] - power_eye_x[0, i], label=l_name[i] + 'R_x')
-    #axs.plot(t, power_eye_y[:, i] - power_eye_y[0, i], label=l_name[i] + 'R_y')
+    axs.plot(t, power_eye_x[:, i] - power_eye_x[0, i], label=l_name[i] + 'R_x')
+    axs.plot(t, power_eye_y[:, i] - power_eye_y[0, i], label=l_name[i] + 'R_y')
     axs.plot(t, p[:, i] - p[0, i], label=l_name[i] + 'R pentacam', marker='+')
 
 leg = axs.legend(loc='lower right', fontsize=9)

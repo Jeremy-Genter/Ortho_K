@@ -81,8 +81,8 @@ for k in dir_list:
         power_eye[j] = (n - 1) / (R_n[j] * 1e-3)
     # plot radius eye
     index_prestr = np.argmin(np.abs(t-64))
-    ax00.plot(t[index_prestr:] / 3600, power_eye[index_prestr:] - power_eye[index_prestr], label=k[5:])
-    leg = ax00.legend(loc='lower right', fontsize=9)
+    ax00.plot(t[index_prestr:] / 3600, power_eye[index_prestr:] - power_eye[index_prestr])  # , label=k[5:])
+    # leg = ax00.legend(loc='lower right', fontsize=9)
     ax00.set_xlabel('time [h]', Fontsize=12)
     ax00.set_ylabel('refractive power change [D]', Fontsize=12)
     plt.xticks((np.arange(0, 20, 2)))
