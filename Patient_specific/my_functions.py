@@ -276,6 +276,21 @@ def ellipsoid_fit(data):
     return res.x
 
 
+def f_circ2(init, *data):
+    data = np.array(data[0:2])[:, :, 0]
+    x = data[0, :]
+    y = data[1, :]
+    return (-init[0]**2 + (x-init[1])**2 + (y-init[2])**2)**2
+
+
+def circ2_fit(data):
+    x = np.reshape(data[:, 0], [len(data[:, 0]), 1])
+    y = np.reshape(data[:, 1], [len(data[:, 0]), 1])
+    init = np.array([7.6, 0, 0])
+    res = optimize.least_squares(f_circ2, init, args=np.array([x, y]))
+    return res.x
+
+
 def f_circ(init, *data):
     data = np.array(data[0:2])[:, :, 0]
     x = data[0, :]

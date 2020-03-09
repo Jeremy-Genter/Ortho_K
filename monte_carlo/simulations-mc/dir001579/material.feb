@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<febio_spec version="2.5">
+	<Module type="biphasic"/>
+	<Include>parameters.feb</Include>
+	<Globals>
+		<Constants>
+			<T>0</T>
+			<R>0</R>
+			<Fc>0</Fc>
+		</Constants>
+	</Globals>
+	<Material>
+		<material id="1" name="Material_stroma" type="biphasic">
+			<phi0>0.2</phi0>
+			<fluid_density>1000</fluid_density>
+			<solid type="viscoelastic">
+				<g1>@gamma_stroma</g1>
+				<g2>0</g2>
+				<g3>0</g3>
+				<g4>0</g4>
+				<g5>0</g5>
+				<g6>0</g6>
+				<t1>@tau_stroma</t1>
+				<t2>1</t2>
+				<t3>1</t3>
+				<t4>1</t4>
+				<t5>1</t5>
+				<t6>1</t6>
+				<elastic type="Ogden">
+					<density>1</density>
+					<m1>@m_1</m1>
+					<c1>@c_1</c1>
+					<k>@k</k>
+				</elastic>
+			</solid>
+			<permeability type="perm-const-iso">
+				<perm>@k_stroma</perm>
+			</permeability>
+		</material>
+		<material id="2" name="Material_epithelium" type="biphasic">
+			<phi0>0.2</phi0>
+			<fluid_density>1000</fluid_density>
+			<solid type="viscoelastic">
+				<g1>@gamma_epi</g1>
+				<g2>0</g2>
+				<g3>0</g3>
+				<g4>0</g4>
+				<g5>0</g5>
+				<g6>0</g6>
+				<t1>@tau_epi</t1>
+				<t2>1</t2>
+				<t3>1</t3>
+				<t4>1</t4>
+				<t5>1</t5>
+				<t6>1</t6>
+				<elastic type="neo-Hookean">
+					<density>1</density>
+					<E>@E_epi</E>
+					<v>@nu_epi</v>
+				</elastic>
+			</solid>
+			<permeability type="perm-const-iso">
+				<perm>@k_epi</perm>
+			</permeability>
+		</material>
+		<material id="3" name="Material_lens" type="rigid body">
+			<density>1</density>
+			<center_of_mass>0,0,0</center_of_mass>
+		</material>
+	</Material>
+</febio_spec>

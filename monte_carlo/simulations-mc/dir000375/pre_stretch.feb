@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<febio_spec version="2.5">
+	<Module type="biphasic"/>
+	<Include>parameters.feb</Include>
+	<Globals>
+		<Constants>
+			<T>0</T>
+			<R>0</R>
+			<Fc>0</Fc>
+		</Constants>
+	</Globals>
+		<Material from="material_prestretch.feb"/>
+		<Geometry from="geometry_opt.feb"/>
+	<Boundary>
+		<fix bc="x,z" node_set="axis_BC"/>
+		<rigid_body mat="3">
+			<fixed bc="x"/>
+			<fixed bc="z"/>
+			<fixed bc="Rx"/>
+			<fixed bc="Ry"/>
+			<fixed bc="Rz"/>
+		</rigid_body>
+	</Boundary>
+	<Contact>
+		<contact type="sliding-biphasic" name="BiphasicContact1" surface_pair="BiphasicContact1">
+			<laugon>1</laugon>
+			<tolerance>0.2</tolerance>
+			<gaptol>0</gaptol>
+			<ptol>0</ptol>
+			<penalty>1</penalty>
+			<two_pass>0</two_pass>
+			<auto_penalty>0</auto_penalty>
+			<pressure_penalty>0</pressure_penalty>
+			<symmetric_stiffness>0</symmetric_stiffness>
+			<search_radius>1</search_radius>
+			<seg_up>0</seg_up>
+			<minaug>0</minaug>
+			<maxaug>10</maxaug>
+			<search_tol>0.01</search_tol>
+		</contact>
+	</Contact>
+        <Constraints>
+                <constraint type="symmetry plane" name="SymmetryPlane_x" surface="SymmetryPlane_x">
+                        <laugon>1</laugon>
+                        <tol>0.2</tol>
+                        <penalty>1</penalty>
+                        <minaug>0</minaug>
+                        <maxaug>0</maxaug>
+                </constraint>
+                <constraint type="symmetry plane" name="SymmetryPlane_z" surface="SymmetryPlane_z">
+                        <laugon>1</laugon>
+                        <tol>0.2</tol>
+                        <penalty>1</penalty>
+                        <minaug>0</minaug>
+                        <maxaug>0</maxaug>
+                </constraint>
+        </Constraints>
+	<Include>pre_stretch_load_curve.feb</Include>
+	<Include>pre_stretch_must_point_curve.feb</Include>
+	<Output>
+		<plotfile type="febio">
+			<var type="displacement"/>
+			<var type="stress"/>
+			<var type="effective fluid pressure"/>
+			<var type="fluid flux"/>
+			<var type="volume fraction"/>
+			<var type="relative volume"/>
+			<var type="rigid force"/>
+		</plotfile>
+		<logfile>
+                        <node_data data="x;y;z" delim="," file="disp_pre_stretch.dat"/>
+		</logfile>
+	</Output>
+	<Step name="pre_stretch">
+		<Control>
+			<time_steps>@time_prestretch</time_steps>
+			<step_size>0.1</step_size>
+			<max_refs>25</max_refs>
+			<max_ups>20</max_ups>
+			<diverge_reform>1</diverge_reform>
+			<reform_each_time_step>1</reform_each_time_step>
+			<dtol>0.001</dtol>
+			<etol>0.01</etol>
+			<rtol>0</rtol>
+			<ptol>0.01</ptol>
+			<lstol>0.9</lstol>
+			<min_residual>1e-20</min_residual>
+			<qnmethod>0</qnmethod>
+			<time_stepper>
+				<dtmin>0.0001</dtmin>
+				<dtmax lc="2">1</dtmax>
+				<max_retries>15</max_retries>
+				<opt_iter>20</opt_iter>
+			</time_stepper>
+			<analysis type="steady-state"/>
+		</Control>
+		<Loads>
+			<surface_load type="pressure" surface="IOP">
+				<pressure lc="1">0.002066497</pressure>
+				<linear>0</linear>
+				<symmetric_stiffness>1</symmetric_stiffness>
+			</surface_load>
+		</Loads>
+		<Boundary>
+			<rigid_body mat="3">
+				<prescribed bc="y" lc="1">10</prescribed>
+			</rigid_body>
+	                <fix bc="y" node_set="Limbus"/>
+		</Boundary>
+	</Step>
+</febio_spec>

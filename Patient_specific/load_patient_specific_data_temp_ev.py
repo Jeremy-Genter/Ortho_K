@@ -4,6 +4,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from scipy.optimize import fsolve
 from my_functions import *
+from scipy.interpolate import griddata
 from copy import deepcopy
 from mpl_toolkits import mplot3d
 
@@ -23,7 +24,7 @@ fig1, axs1 = plt.subplots(2, 3)
 fig1.suptitle('Left Eye Patient 3', fontsize=16)
 fig2, axs2 = plt.subplots(2, 3)
 fig2.suptitle('Right Eye Patient 3', fontsize=16)
-t = [-8, 0, 20/60, 40/60, 1, 4]
+t = np.round([-8, 0, 36/60, 53/60, 80/60, 4+23/60], 2)+8
 n = 1.3375
 
 for loop in range(6):
@@ -38,16 +39,31 @@ for loop in range(6):
         x, y = np.meshgrid(x, y)
         rho, phi = cart2pol(x, y)
         index_sim_ker = np.where(rho < 1.5)
-
-        phi_1 = phi.reshape([-1, 1])
-        phi_index = np.argsort(phi_1, axis=0)
-        phi_new = np.zeros([phi.shape[0], phi.shape[1]])
+        points = np.concatenate((x.reshape((-1, 1)), y.reshape((-1, 1)) ), axis=1)
+        values = an_surf.reshape((-1, 1))
         j = 0
-        for i in range(len(phi[:, 0])):
-            for ii in range(len(phi[0, :])):
-                phi_new[i, ii] = phi[np.unravel_index(np.ravel_multi_index([phi_index[j][0], 0], phi_1.shape), phi.shape)]
-                rho_new[i, ii] = rho[np.unravel_index(np.ravel_multi_index([phi_index[j][0], 0], phi_1.shape), phi.shape)]
-                j += 1
+        while j < len(values[:, 0]):
+            if np.sum(np.isnan(values[j, :])) > 0:
+                values = np.delete(values, j, axis=0)
+                points = np.delete(points, j, axis=0)
+                continue
+            j += 1
+        rho_new = np.linspace(-6, 6, 40)
+        phi_new = np.linspace(0, 2*np.pi, 20)
+        rho_new, phi_new = np.meshgrid(rho_new, phi_new)
+        grid_x, grid_y = pol2cart(rho_new, phi_new)
+
+        ref_power = np.full((grid_x.shape), np.nan)
+        for i in range(ref_power.shape[0]):
+            for ii in range(3, ref_power.shape[1]-3):
+                temp = np.zeros([7, 2])
+                temp[:, 0] = rho_new[i, ii-3:ii+4].reshape((-1, 1))[:, 0]
+                temp[:, -1] = griddata(points, values, (grid_x[i, ii-3:ii+4], grid_y[i, ii-3:ii+4]),
+                                       method='cubic')[:, 0]
+                if np.isnan(temp[:, -1]).any() == False:
+                    ref_power[i, ii] = (n-1)/(circ2_fit(temp)[0]*1e-3)
+                #else:
+                    #print(temp[:,-1])
 
         data_an = np.zeros([len(index_sim_ker[0]), 3])
         data_an[:, 0] = np.reshape(x[index_sim_ker], (-1, 1))[:, 0]
@@ -99,23 +115,44 @@ for loop in range(6):
         power_eye[loop, loop_2] = (n - 1) / (R[loop, loop_2] * 1e-3)
         #power_eye_x[loop, loop_2] = (n - 1) / (R_x[loop, loop_2] * 1e-3)
         #power_eye_y[loop, loop_2] = (n - 1) / (R_y[loop, loop_2] * 1e-3)
+        levels = np.linspace(38, 50, 150)
+        if loop_2 == 0:
 
-        # if loop_2 == 0:
-        #     levels = np.linspace(40, 55, 150)
-        #     CS = axs1[loop].contourf(x, y, an_power, levels=levels, cmap='rainbow')
-        #     cbar = fig1.colorbar(CS, ax=axs1[loop])
-        #     cbar.ax.set_ylabel('refractive power [D]')
-        #     axs1[loop].set_title(str(t[loop]) + 'h')
-        #     axs1[loop].set_xlabel('X-Coordinates [mm]')
-        #     axs1[loop].set_ylabel('Y-Coordinates [mm]')
-        # elif loop_2 == 1:
-        #     levels = np.linspace(40, 55, 150)
-        #     CS = axs2[loop].contourf(x, y, an_power, levels=levels, cmap='rainbow')
-        #     cbar = fig2.colorbar(CS, ax=axs2[loop])
-        #     cbar.ax.set_ylabel('refractive power [D]')
-        #     axs2[loop].set_title(str(t[loop]) + 'h')
-        #     axs2[loop].set_xlabel('X-Coordinates [mm]')
-        #     axs2[loop].set_ylabel('Y-Coordinates [mm]')
+            if loop < 3:
+                CS = axs1[0, loop].contourf(grid_x, grid_y, ref_power, levels=levels, cmap='rainbow')
+                if loop == 2:
+                    cbar = fig1.colorbar(CS, ax=axs1[0, 2])
+                    cbar.ax.set_ylabel('refractive power [D]')
+                axs1[0, loop].set_title(str(t[loop]) + 'h')
+                axs1[0, loop].set_xlabel('X-Coordinates [mm]')
+                axs1[0, loop].set_ylabel('Y-Coordinates [mm]')
+            else:
+                CS = axs1[1, loop-3].contourf(grid_x, grid_y, ref_power, levels=levels, cmap='rainbow')
+                if loop == 5:
+                    cbar = fig1.colorbar(CS, ax=axs1[1, 2])
+                    cbar.ax.set_ylabel('refractive power [D]')
+                axs1[1, loop-3].set_title(str(t[loop]) + 'h')
+                axs1[1, loop-3].set_xlabel('X-Coordinates [mm]')
+                axs1[1, loop-3].set_ylabel('Y-Coordinates [mm]')
+
+        elif loop_2 == 1:
+
+            if loop < 3:
+                CS = axs2[0, loop].contourf(grid_x, grid_y, ref_power, levels=levels, cmap='rainbow')
+                if loop == 2:
+                    cbar = fig2.colorbar(CS, ax=axs2[0, 2])
+                    cbar.ax.set_ylabel('refractive power [D]')
+                axs2[0, loop].set_title(str(t[loop]) + 'h')
+                axs2[0, loop].set_xlabel('X-Coordinates [mm]')
+                axs2[0, loop].set_ylabel('Y-Coordinates [mm]')
+            else:
+                CS = axs2[1, loop-3].contourf(grid_x, grid_y, ref_power, levels=levels, cmap='rainbow')
+                if loop == 5:
+                    cbar = fig2.colorbar(CS, ax=axs2[1, 2])
+                    cbar.ax.set_ylabel('refractive power [D]')
+                axs2[1, loop-3].set_title(str(t[loop]) + 'h')
+                axs2[1, loop-3].set_xlabel('X-Coordinates [mm]')
+                axs2[1, loop-3].set_ylabel('Y-Coordinates [mm]')
 
 
         # fig = plt.figure()
@@ -126,7 +163,7 @@ for loop in range(6):
 fig, axs = plt.subplots()
 
 l_name = ['Left Eye ', 'Right Eye ']
-fig1.suptitle('Temproal evolution Patient 3', fontsize=16)
+fig.suptitle('Temproal evolution Patient 3', fontsize=16)
 r = np.zeros([6, 2])
 r[:, 0] = [(7.43+7.33)/2, (7.65+7.45)/2, (7.58+7.38)/2, (7.55+7.34)/2, (7.56+7.31)/2, (7.56+7.38)/2]
 r[:, 1] = [(7.47+7.3)/2, (7.63+7.4)/2, (7.6+7.38)/2, (7.56+7.34)/2, (7.56+7.29)/2, (7.54+7.31)/2]

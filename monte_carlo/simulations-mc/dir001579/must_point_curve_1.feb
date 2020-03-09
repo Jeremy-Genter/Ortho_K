@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<febio_spec version="2.5">
+	<LoadData>
+		<loadcurve id="6" type="linear"extend="constant">
+			<loadpoint>64, 1</loadpoint>
+			<loadpoint>124, 8</loadpoint>
+			<loadpoint>564, 250</loadpoint>
+			<loadpoint>2564, 1200</loadpoint>
+			<loadpoint>28864, 2500</loadpoint>
+		</loadcurve>
+	</LoadData>
+</febio_spec>

@@ -51,11 +51,14 @@ for loop in range(4):
     epi_mean_r[loop+4] = epi_r[[0, -1], :].mean()
     epi_std_r[loop+4] = epi_r[[0, -1], :].std()
 
+epi = np.zeros([4,1])
 for i in range(2):
+    epi[i] = epi_mean_l[2*i]-epi_mean_l[2*i+1]
     print('left eye central:', epi_mean_l[2*i]-epi_mean_l[2*i+1], '+/-', epi_std_l[i], 'mid-periphery:', epi_mean_l[i+4], '+/-', epi_std_l[i+4])
 for i in range(2):
+    epi[i+2] = epi_mean_r[2 * i] - epi_mean_r[2 * i + 1]
     print('right eye central:', epi_mean_r[2*i]-epi_mean_r[2*i+1], '+/-', epi_std_r[i], 'mid-periphery:', epi_mean_r[i+4], '+/-', epi_std_r[i+4])
-
+print(epi.mean(), '+/-' + str(epi.std()))
 fig, axs = plt.subplots()
 fig.suptitle('Thickness Epithelium')
 axs.set_ylabel('thickness epithleium [$\mu m$]')

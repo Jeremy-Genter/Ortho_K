@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<febio_spec version="2.5">
+	<Parameters>
+		<param name="m_1">65.75</param>
+		<param name="c_1">0.0065</param>
+		<param name="k">100</param>
+		<param name="k_stroma">0.0027846492272452</param>
+		<param name="gamma_stroma">0</param>
+		<param name="tau_stroma">0</param>
+		<param name="E_epi">0.0009211888778502835</param>
+		<param name="nu_epi">0.075</param>
+		<param name="k_epi">1.1325154518350857e-07</param>
+		<param name="gamma_epi">0</param>
+		<param name="tau_epi">0</param>
+		<param name="time_prestretch">640</param>
+		<param name="time_initiating_contact">100</param>
+		<param name="time_load_end">287900</param>
+		<param name="time_unload_end">360000</param>
+		<param name="eye_lid_pressure">0.00022</param>
+	</Parameters>
+</febio_spec>
