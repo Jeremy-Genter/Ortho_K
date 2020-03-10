@@ -102,13 +102,13 @@ for loop in range(6):
             j += 1
 
 
-        R_temp = keratometry(data_an)  # , mode='sphere')
+        # R_temp = keratometry(data_an)  # , mode='sphere')
         # R_temp = keratometry(data_an, mode='sphere')
-        R_x[loop, loop_2] = R_temp[3]['Rx']
-        R_y[loop, loop_2] = R_temp[3]['Ry']
-        R[loop, loop_2] = (R_x[loop, loop_2] + R_y[loop, loop_2])/2
+        # R_x[loop, loop_2] = R_temp[3]['Rx']
+        # R_y[loop, loop_2] = R_temp[3]['Ry']
+        # R[loop, loop_2] = (R_x[loop, loop_2] + R_y[loop, loop_2])/2
 
-        # R[loop, loop_2] = sphere_fit(data_an)[0]
+        R[loop, loop_2] = sphere_fit(data_an)[0]
 
         # R_temp = ellipsoid_fit(data_an)
         # R[loop, loop_2] = (R_temp[0] + R_temp[1])/2
@@ -167,16 +167,21 @@ fig, axs = plt.subplots()
 
 l_name = ['Left Eye ', 'Right Eye ']
 fig.suptitle('Temproal evolution Patient 3', fontsize=16)
-r = np.zeros([6, 2])
-r[:, 0] = [(7.43+7.33)/2, (7.65+7.45)/2, (7.58+7.38)/2, (7.55+7.34)/2, (7.56+7.31)/2, (7.56+7.38)/2]
-r[:, 1] = [(7.47+7.3)/2, (7.63+7.4)/2, (7.6+7.38)/2, (7.56+7.34)/2, (7.56+7.29)/2, (7.54+7.31)/2]
-p = n/(r*1e-3)
+r_x = np.zeros([6, 2])
+r_y = np.zeros([6, 2])
+r_x[:, 0] = [(7.43), (7.65), (7.58), (7.55), (7.56), (7.56)]
+r_x[:, 1] = [(7.47), (7.63), (7.6), (7.56), (7.56), (7.54)]
+r_y[:, 0] = [(7.33), 7.45, (7.38), (7.34), 7.31, 7.38]
+r_y[:, 1] = [(7.3), (7.4), (7.38), (7.34), (7.29), (7.31)]
+p_x = (n-1)/(r_x*1e-3)
+p_y = (n-1)/(r_y*1e-3)
 
 for i in range(2):
-    axs.plot(t, power_eye[:, i]-power_eye[0, i], label=l_name[i] + 'R', marker='+')
-    axs.plot(t, power_eye_x[:, i] - power_eye_x[0, i], label=l_name[i] + 'R_x')
-    axs.plot(t, power_eye_y[:, i] - power_eye_y[0, i], label=l_name[i] + 'R_y')
-    axs.plot(t, p[:, i] - p[0, i], label=l_name[i] + 'R pentacam', marker='+')
+    # axs.plot(t, power_eye[:, i]-power_eye[0, i], label=l_name[i] + 'R', marker='+')
+    # axs.plot(t, power_eye_x[:, i] - power_eye_x[0, i], label=l_name[i] + 'R_x')
+    # axs.plot(t, power_eye_y[:, i] - power_eye_y[0, i], label=l_name[i] + 'R_y')
+    axs.plot(t, p_x[:, i] - p_x[0, i], label=l_name[i] + 'R_x pentacam', marker='+')
+    axs.plot(t, p_y[:, i] - p_y[0, i], label=l_name[i] + 'R_y pentacam', marker='+')
 
 leg = axs.legend(loc='lower right', fontsize=9)
 axs.set_xlabel('time [h]', Fontsize=12)
