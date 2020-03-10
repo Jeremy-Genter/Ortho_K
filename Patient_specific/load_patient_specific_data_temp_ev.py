@@ -177,7 +177,7 @@ p_x = (n-1)/(r_x*1e-3)
 p_y = (n-1)/(r_y*1e-3)
 
 for i in range(2):
-    # axs.plot(t, power_eye[:, i]-power_eye[0, i], label=l_name[i] + 'R', marker='+')
+    axs.plot(t, power_eye[:, i]-power_eye[0, i], label=l_name[i] + 'R', marker='+')
     # axs.plot(t, power_eye_x[:, i] - power_eye_x[0, i], label=l_name[i] + 'R_x')
     # axs.plot(t, power_eye_y[:, i] - power_eye_y[0, i], label=l_name[i] + 'R_y')
     axs.plot(t, p_x[:, i] - p_x[0, i], label=l_name[i] + 'R_x pentacam', marker='+')
