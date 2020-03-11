@@ -49,21 +49,21 @@ for loop in range(6):
                 continue
             j += 1
         rho_new = np.linspace(-6, 6, 40)
-        phi_new = np.linspace(0, 2*np.pi, 20)
+        phi_new = np.linspace(0, 2*np.pi, 15)
         rho_new, phi_new = np.meshgrid(rho_new, phi_new)
         grid_x, grid_y = pol2cart(rho_new, phi_new)
 
         ref_power = np.full((grid_x.shape), np.nan)
         R_map = np.full((grid_x.shape), np.nan)
-        # for i in range(ref_power.shape[0]):
-        #     for ii in range(3, ref_power.shape[1]-3):
-        #         temp = np.zeros([7, 2])
-        #         temp[:, 0] = rho_new[i, ii-3:ii+4].reshape((-1, 1))[:, 0]
-        #         temp[:, -1] = griddata(points, values, (grid_x[i, ii-3:ii+4], grid_y[i, ii-3:ii+4]),
-        #                                method='cubic')[:, 0]
-        #         if np.isnan(temp[:, -1]).any() == False:
-        #             R_map[i, ii] = circ2_fit(temp)[0]
-        #             ref_power[i, ii] = (n-1)/(R_map[i, ii]*1e-3)
+        for i in range(ref_power.shape[0]):
+            for ii in range(3, ref_power.shape[1]-3):
+                temp = np.zeros([7, 2])
+                temp[:, 0] = rho_new[i, ii-3:ii+4].reshape((-1, 1))[:, 0]
+                temp[:, -1] = griddata(points, values, (grid_x[i, ii-3:ii+4], grid_y[i, ii-3:ii+4]),
+                                       method='cubic')[:, 0]
+                if np.isnan(temp[:, -1]).any() == False:
+                    R_map[i, ii] = circ2_fit(temp)[0]
+                    ref_power[i, ii] = (n-1)/(R_map[i, ii]*1e-3)
         # index_mean_R = np.where(rho_new < 1.5)
         # R[loop, loop_2] = np.nanmedian(R_map[index_mean_R])
 

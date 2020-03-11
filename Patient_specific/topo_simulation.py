@@ -8,6 +8,9 @@ from scipy.interpolate import griddata
 from copy import deepcopy
 from mpl_toolkits import mplot3d
 
+folders = ['Patient_1/PRE/', 'Patient_1/POST/']
+
+file_names = ['TopoOIpre.csv', 'TopoOIpost.csv']
 
 fig1, axs1 = plt.subplots(2, 2)
 fig1.suptitle('Left Eye Patient 1: Quater Model', fontsize=16)
@@ -16,10 +19,11 @@ n = 1.3375
 
 dir_list = ['dir00']  # os.listdir(os.getcwd())
 
-thickness_central = np.full([2000, 2], np.nan)
-thickness_midperi = np.full([2000, 2], np.nan)
-R_n = np.full([2000, 2], np.nan)
-power_eye = np.full([2000, 2], np.nan)
+rho_new = np.linspace(-6, 6, 40)
+phi_new = np.linspace(0, 2*np.pi, 15)
+rho_new, phi_new = np.meshgrid(rho_new, phi_new)
+grid_x, grid_y = pol2cart(rho_new, phi_new)
+levels = np.linspace(38, 50, 150)
 
 for k in dir_list:
 
@@ -72,11 +76,6 @@ for k in dir_list:
                 continue
             j += 1
 
-        rho_new = np.linspace(-6, 6, 40)
-        phi_new = np.linspace(0, 2*np.pi, 20)
-        rho_new, phi_new = np.meshgrid(rho_new, phi_new)
-        grid_x, grid_y = pol2cart(rho_new, phi_new)
-
         ref_power = np.full((grid_x.shape), np.nan)
         R_map = np.full((grid_x.shape), np.nan)
         for i in range(ref_power.shape[0]):
@@ -89,7 +88,7 @@ for k in dir_list:
                     ref_power[i, ii] = (n-1)/(R_map[i, ii]*1e-3)
 
 
-        levels = np.linspace(38, 50, 150)
+
 
         CS = axs1[kk_, 0].contourf(grid_x, grid_y, ref_power, levels=levels, cmap='rainbow')
         axs1[kk_, 0].set_title(str(t_meas[kk_]) + 'h')
@@ -98,7 +97,37 @@ for k in dir_list:
         kk_ += 1
 
     kk_ = 0
+    an_surf = np.zeros([31, 256])
     for time in t_meas:
+        an_surf[1:, :] = pd.read_csv(folders[kk_] + file_names[kk_], skiprows=35, nrows=30, delimiter=';').values[:, :-1]
+        an_surf[an_surf < -5] = np.nan
+        an_surf[:, 0] = (an_surf[:, 0] + an_surf[:, -1])/2
+        an_surf[:, -1] = an_surf[:, 0]
+        theta = np.linspace(0, 2 * np.pi, 256)
+        r = np.linspace(0, 6, 31)
+        theta, r = np.meshgrid(theta, r)
+        x, y = pol2cart(r, theta)
+        points = np.concatenate((x.reshape((-1, 1)), y.reshape((-1, 1)) ), axis=1)
+        values = an_surf.reshape((-1, 1))
+
+        j = 0
+        while j < len(values):
+            if np.sum(np.isnan(values[j][0])) > 0:
+                values = np.delete(values, j, axis=0)
+                points = np.delete(points, j, axis=0)
+                continue
+            j += 1
+
+        ref_power = np.full((grid_x.shape), np.nan)
+        R_map = np.full((grid_x.shape), np.nan)
+        for i in range(ref_power.shape[0]):
+            for ii in range(3, ref_power.shape[1]-3):
+                temp = np.zeros([7, 2])
+                temp[:, 0] = rho_new[i, ii-3:ii+4].reshape((-1, 1))[:, 0]
+                temp[:, -1] = griddata(points, values, (grid_x[i, ii-3:ii+4], grid_y[i, ii-3:ii+4]), method='cubic')[:,0]
+                if np.isnan(temp[:, -1]).any() == False:
+                    R_map[i, ii] = circ2_fit(temp)[0]
+                    ref_power[i, ii] = (n-1)/(R_map[i, ii]*1e-3)
 
         CS = axs1[kk_, 1].contourf(grid_x, grid_y, ref_power, levels=levels, cmap='rainbow')
         cbar = fig1.colorbar(CS, ax=axs1[kk_, 1])
