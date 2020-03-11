@@ -17,7 +17,7 @@ fig1.suptitle('Left Eye Patient 1: Quater Model', fontsize=16)
 t_meas = [64, 16*3600+64]
 n = 1.3375
 
-dir_list = ['dir00']  # os.listdir(os.getcwd())
+dir_list = ['Patient_1_OS/dir00']  # os.listdir(os.getcwd())
 
 rho_new = np.linspace(-6, 6, 40)
 phi_new = np.linspace(0, 2*np.pi, 15)
@@ -91,7 +91,7 @@ for k in dir_list:
 
 
         CS = axs1[kk_, 0].contourf(grid_x, grid_y, ref_power, levels=levels, cmap='rainbow')
-        axs1[kk_, 0].set_title(str(t_meas[kk_]) + 'h')
+        axs1[kk_, 0].set_title(str(np.round((t_meas[kk_]-64)/3600, 2)) + 'h')
         axs1[kk_, 0].set_xlabel('X-Coordinates [mm]')
         axs1[kk_, 0].set_ylabel('Y-Coordinates [mm]')
         kk_ += 1
@@ -132,7 +132,7 @@ for k in dir_list:
         CS = axs1[kk_, 1].contourf(grid_x, grid_y, ref_power, levels=levels, cmap='rainbow')
         cbar = fig1.colorbar(CS, ax=axs1[kk_, 1])
         cbar.ax.set_ylabel('refractive power [D]')
-        axs1[kk_, 1].set_title(str(t_meas[kk_]) + 'h')
+        axs1[kk_, 1].set_title(str(np.round((t_meas[kk_]-64)/3600, 2)) + 'h')
         axs1[kk_, 1].set_xlabel('X-Coordinates [mm]')
         axs1[kk_, 1].set_ylabel('Y-Coordinates [mm]')
 
