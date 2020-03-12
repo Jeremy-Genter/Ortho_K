@@ -18,13 +18,13 @@ fig1.suptitle('Right Eye Patient 3', fontsize=16)
 t_meas = np.asarray([0, 8*3600, (8+36/60)*3600, (8+53/60)*3600, (8+80/60)*360, (8+4+23/60)*3600])+64
 n = 1.3375
 
-dir_list = ['Patient_3_OD/dir00']  # os.listdir(os.getcwd())
+dir_list = ['Patient_3_OD/dir01']  # os.listdir(os.getcwd())
 
 rho_new = np.linspace(-6, 6, 40)
 phi_new = np.linspace(0, 2*np.pi, 15)
 rho_new, phi_new = np.meshgrid(rho_new, phi_new)
 grid_x, grid_y = pol2cart(rho_new, phi_new)
-levels = np.linspace(35, 72, 150)
+levels = np.linspace(35, 60, 150)
 
 for k in dir_list:
 

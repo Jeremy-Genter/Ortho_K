@@ -26,7 +26,7 @@ l_name = np.ndarray.tolist(E_epi) + np.ndarray.tolist(k_epi) + np.ndarray.tolist
 l_name = ['E: 1.5 kPa; $k_{epi}$: 7.5e-6 $\dfrac{mm^4}{Ns}$; k_stroma:$k_{stroma}$: 2.66e-3 $\dfrac{mm^4}{Ns}$ left']
 l_name = ['Patient 3 OD']
 # l_name = np.ndarray.tolist(E_epi) + ['$p_{eyelid}=1\,kPa$ $E_{epi} = 4$', 'sealed Boundary']
-dir = [0]
+dir = [1]
 thickness_central = np.zeros([len(dir), 1])
 thickness_midperi = np.zeros([len(dir), 1])
 kk_ = 0

@@ -7,12 +7,12 @@ from my_functions import *
 from copy import deepcopy
 from mpl_toolkits import mplot3d
 
-folder_patient_1_pre = 'Patient_1/PRE/'
+folder_patient_1_pre = 'MN/'  # 'Patient_1/PRE/'
 folder_patient_1_post = 'Patient_1/POST/'
 folder_patient_2_pre = 'Patient_2/PRE/'
 folder_patient_2_post = 'Patient_2/POST_1day/'
 
-file_names = ['TopoOIpre.csv', 'TopoODpre.csv', 'TopoOIpost.csv', 'TopoODpost.csv']
+file_names = ['OS6MN.csv']  # ['TopoOIpre.csv', 'TopoODpre.csv', 'TopoOIpost.csv', 'TopoODpost.csv']
 
 R = np.zeros([4, 4])
 
@@ -22,10 +22,10 @@ thickness_l = np.zeros([31, 256])
 thickness_r = np.zeros([31, 256])
 pos_surf_l = np.zeros([31, 256])
 pos_surf_r = np.zeros([31, 256])
-for loop in range(4):
+for loop in range(1):
     if loop == 0:
-        p_data_l = pd.read_csv(folder_patient_1_pre + file_names[0], skiprows=2)
-        p_data_r = pd.read_csv(folder_patient_1_pre + file_names[1], skiprows=2)
+        p_data_l = pd.read_csv(folder_patient_1_pre + file_names[0], skiprows=27)
+        p_data_r = pd.read_csv(folder_patient_1_pre + file_names[0], skiprows=27)
     elif loop == 1:
         p_data_l = pd.read_csv(folder_patient_1_post + file_names[2], skiprows=2)
         p_data_r = pd.read_csv(folder_patient_1_post + file_names[3], skiprows=2)
@@ -107,12 +107,14 @@ for loop in range(4):
         j += 1
 
     if loop == 0:
-        np.savetxt('anterior__surf_l_P1_pre', data_an_l[255:, :])
-        np.savetxt('anterior__surf_r_P1_pre', data_an_r[255:, :])
-        np.savetxt('posterior_surf_l_P1_pre', data_pos_l[255:, :])
-        np.savetxt('posterior_surf_r_P1_pre', data_pos_r[255:, :])
-        np.savetxt('thickness_l_P1_pre', data_thickness_l[255:, :])
-        np.savetxt('thickness_r_P1_pre', data_thickness_r[255:, :])
+        np.savetxt('anterior__surf_MN_OS_pre', data_an_l[255:, :])
+        np.savetxt('posterior_surf_MN_OS_pre', data_pos_l[255:, :])
+        # np.savetxt('anterior__surf_l_P1_pre', data_an_l[255:, :])
+        # np.savetxt('anterior__surf_r_P1_pre', data_an_r[255:, :])
+        # np.savetxt('posterior_surf_l_P1_pre', data_pos_l[255:, :])
+        # np.savetxt('posterior_surf_r_P1_pre', data_pos_r[255:, :])
+        # np.savetxt('thickness_l_P1_pre', data_thickness_l[255:, :])
+        # np.savetxt('thickness_r_P1_pre', data_thickness_r[255:, :])
     elif loop == 1:
         np.savetxt('anterior__surf_l_P1_post', data_an_l[255:, :])
         np.savetxt('anterior__surf_r_P1_post', data_an_r[255:, :])
