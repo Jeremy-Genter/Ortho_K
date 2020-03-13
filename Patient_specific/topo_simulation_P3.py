@@ -93,8 +93,8 @@ for k in dir_list:
 
         CS = axs1[kk_, 0].contourf(grid_x, grid_y, ref_power, levels=levels, cmap='rainbow')
         axs1[kk_, 0].set_title(str(np.round((t_meas[kk_]-64)/3600, 2)) + 'h')
-        axs1[kk_, 0].set_xlabel('X-Coordinates [mm]')
-        axs1[kk_, 0].set_ylabel('Y-Coordinates [mm]')
+        axs1[kk_, 0].set_xlabel('X [mm]')
+        axs1[kk_, 0].set_ylabel('Y [mm]')
         kk_ += 1
 
     kk_ = 0
@@ -130,11 +130,12 @@ for k in dir_list:
 
 
         CS = axs1[kk_, 1].contourf(grid_x, grid_y, ref_power, levels=levels, cmap='rainbow')
-        cbar = fig1.colorbar(CS, ax=axs1[kk_, 1])
-        cbar.ax.set_ylabel('refractive power [D]')
+        if kk_ == len(t_meas):
+            cbar = fig1.colorbar(CS, ax=axs1[kk_, 1])
+            cbar.ax.set_ylabel('refractive power [D]')
         axs1[kk_, 1].set_title(str(np.round((t_meas[kk_]-64)/3600, 2)) + 'h')
-        axs1[kk_, 1].set_xlabel('X-Coordinates [mm]')
-        axs1[kk_, 1].set_ylabel('Y-Coordinates [mm]')
+        axs1[kk_, 1].set_xlabel('X [mm]')
+        axs1[kk_, 1].set_ylabel('Y [mm]')
 
         kk_ += 1
 

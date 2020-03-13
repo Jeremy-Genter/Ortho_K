@@ -25,26 +25,25 @@ k_stroma = np.round(np.logspace(-3.4, -2.3, 5), 5)
 l_name = np.ndarray.tolist(E_epi) + np.ndarray.tolist(k_epi) + np.ndarray.tolist(k_stroma)
 l_name = ['E: 1.5 kPa; $k_{epi}$: 7.5e-6 $\dfrac{mm^4}{Ns}$; k_stroma:$k_{stroma}$: 2.66e-3 $\dfrac{mm^4}{Ns}$ left']
 l_name = ['Patient 3 OD']
+folder = 'Patient_3_OD'
 # l_name = np.ndarray.tolist(E_epi) + ['$p_{eyelid}=1\,kPa$ $E_{epi} = 4$', 'sealed Boundary']
-dir = [1]
+os.chdir(folder)
+dir = os.listdir(os.getcwd())
+os.chdir('..')
+
 thickness_central = np.zeros([len(dir), 1])
 thickness_midperi = np.zeros([len(dir), 1])
 kk_ = 0
 for k in dir:
-    if k < 10:
-        path2file = os.path.join('Patient_3_OD/dir' + "0" + str(k), 'anterior_surface.dat')
-        _, nodes_t = load_output_dat_file(path2file)
-        path2file = os.path.join('Patient_3_OD/dir' + "0" + str(k), 'anterior_surface_stroma.dat')
-        _, nodes_t_an_str = load_output_dat_file(path2file)
-        path2file = os.path.join('Patient_3_OD/dir' + "0" + str(k), 'posterior_surface.dat')
-        t, nodes_t_pos = load_output_dat_file(path2file)
-    else:
-        path2file = os.path.join('Patient_3_OD/dir' + str(k), 'anterior_surface.dat')
-        _, nodes_t = load_output_dat_file(path2file)
-        path2file = os.path.join('Patient_3_OD/dir' + str(k), 'anterior_surface_stroma.dat')
-        _, nodes_t_an_str = load_output_dat_file(path2file)
-        path2file = os.path.join('Patient_3_OD/dir' + str(k), 'posterior_surface.dat')
-        t, nodes_t_pos  = load_output_dat_file(path2file)
+    if os.path.isfile(os.path.join(folder, k, 'anterior_surface.dat')) == 0:
+        kk_ += 1
+        continue
+    path2file = os.path.join(folder, k, 'anterior_surface.dat')
+    _, nodes_t = load_output_dat_file(path2file)
+    path2file = os.path.join(folder, k, 'anterior_surface_stroma.dat')
+    t, nodes_t_an_str = load_output_dat_file(path2file)
+    # path2file = os.path.join(folder, k, 'posterior_surface.dat')
+    # t, nodes_t_pos = load_output_dat_file(path2file)
 
     t = np.asarray(t)
     nodes_t = np.asarray(nodes_t)
@@ -55,13 +54,13 @@ for k in dir:
     nodes_index_an_str = nodes_t_an_str[0:int(len(nodes_t_an_str) / len(t)), 0]
     nodes_t_an_str = np.reshape(np.asarray(nodes_t_an_str), (len(t), len(nodes_index_an_str) * 4), order='C')
 
-    nodes_t_pos = np.asarray(nodes_t_pos)
-    nodes_index_pos = nodes_t_pos[0:int(len(nodes_t_pos) / len(t)), 0]
-    nodes_t_pos = np.reshape(np.asarray(nodes_t_pos), (len(t), len(nodes_index_pos) * 4), order='C')
+    #nodes_t_pos = np.asarray(nodes_t_pos)
+    #nodes_index_pos = nodes_t_pos[0:int(len(nodes_t_pos) / len(t)), 0]
+    #nodes_t_pos = np.reshape(np.asarray(nodes_t_pos), (len(t), len(nodes_index_pos) * 4), order='C')
 
     x = np.zeros((len(nodes_index), 3 * len(t)))
     x_an_str = np.zeros((len(nodes_index_an_str), 3 * len(t)))
-    x_pos = np.zeros((len(nodes_index_pos), 3 * len(t)))
+    #x_pos = np.zeros((len(nodes_index_pos), 3 * len(t)))
     iii = 0
     # stitch disp and pos together
     for steps in t:
@@ -76,10 +75,10 @@ for k in dir:
             x_an_str[ii, iii * 3:(iii + 1) * 3] = temp[1:]
             ii += 1
         ii = 0
-        for i in nodes_index_pos:
-            temp = nodes_t_pos[iii, int(np.where(nodes_t_pos[iii, :] == i)[0][0]): int(np.where(nodes_t_pos[iii, :] == i)[0][0]) + 4]
-            x_pos[ii, iii * 3:(iii + 1) * 3] = temp[1:]
-            ii += 1
+        #for i in nodes_index_pos:
+        #    temp = nodes_t_pos[iii, int(np.where(nodes_t_pos[iii, :] == i)[0][0]): int(np.where(nodes_t_pos[iii, :] == i)[0][0]) + 4]
+        #    x_pos[ii, iii * 3:(iii + 1) * 3] = temp[1:]
+        #    ii += 1
         iii += 1
 
     iii = np.abs(t-16*3600).argmin()
@@ -96,32 +95,32 @@ for k in dir:
         r_temp, phi_temp = cart2pol(x[:, i*3], x[:, i*3+1])
         x_zyl = np.concatenate((r_temp.reshape(-1, 1), phi_temp.reshape(-1, 1), x[:, i*3+2].reshape(-1, 1)), axis=1)
         x_zyl = np.array(sorted(x_zyl, key=lambda x_column: x_column[0]))
-        x_zyl_R_x = x_zyl[np.nonzero(x_zyl[:, 1] > -0.001)[0], :]
-        x_zyl_R_y = x_zyl[np.nonzero(x_zyl[:, 1] < -1.57)[0], :]
+        #x_zyl_R_x = x_zyl[np.nonzero(x_zyl[:, 1] > -0.001)[0], :]
+        #x_zyl_R_y = x_zyl[np.nonzero(x_zyl[:, 1] < -1.57)[0], :]
         if i == 0:
             index_1dot5 = np.abs(x_zyl[:, 0] - 1.5).argmin()
-            index_1dot5_x = np.abs(x_zyl_R_x[:, 0] - 1).argmin()
-            index_1dot5_y = np.abs(x_zyl_R_y[:, 0] - 1).argmin()
+            #index_1dot5_x = np.abs(x_zyl_R_x[:, 0] - 1).argmin()
+            #index_1dot5_y = np.abs(x_zyl_R_y[:, 0] - 1).argmin()
             x_1dot5 = np.zeros([index_1dot5, len(t)*3])
-            x_1dot5_x = np.zeros([index_1dot5_x, len(t) * 3])
-            x_1dot5_y = np.zeros([index_1dot5_y, len(t) * 3])
+            #x_1dot5_x = np.zeros([index_1dot5_x, len(t) * 3])
+            #x_1dot5_y = np.zeros([index_1dot5_y, len(t) * 3])
         z_offset = x_zyl[:, 2].min()
         x_zyl[:, 2] = x_zyl[:, 2] - z_offset
         x_temp, y_temp = pol2cart(x_zyl[:index_1dot5, 0], x_zyl[:index_1dot5, 1])
         x_1dot5[:, i * 3:i * 3 + 3] = np.concatenate(
             (x_temp.reshape(-1, 1), y_temp.reshape(-1, 1), x_zyl[:index_1dot5, 2].reshape(-1, 1)), axis=1)
 
-        z_offset = x_zyl_R_x[:, 2].min()
-        x_zyl_R_x[:, 2] = x_zyl_R_x[:, 2] - z_offset
-        x_temp, y_temp = pol2cart(x_zyl_R_x[:index_1dot5_x, 0], x_zyl_R_x[:index_1dot5_x, 1])
-        x_1dot5_x[:, i * 3:i * 3 + 3] = np.concatenate(
-            (x_temp.reshape(-1, 1), y_temp.reshape(-1, 1), x_zyl_R_x[:index_1dot5_x, 2].reshape(-1, 1)), axis=1)
+        #z_offset = x_zyl_R_x[:, 2].min()
+        #x_zyl_R_x[:, 2] = x_zyl_R_x[:, 2] - z_offset
+        #x_temp, y_temp = pol2cart(x_zyl_R_x[:index_1dot5_x, 0], x_zyl_R_x[:index_1dot5_x, 1])
+        #x_1dot5_x[:, i * 3:i * 3 + 3] = np.concatenate(
+        #    (x_temp.reshape(-1, 1), y_temp.reshape(-1, 1), x_zyl_R_x[:index_1dot5_x, 2].reshape(-1, 1)), axis=1)
 
-        z_offset = x_zyl_R_y[:, 2].min()
-        x_zyl_R_y[:, 2] = x_zyl_R_y[:, 2] - z_offset
-        x_temp, y_temp = pol2cart(x_zyl_R_y[:index_1dot5_y, 0], x_zyl_R_y[:index_1dot5_y, 1])
-        x_1dot5_y[:, i * 3:i * 3 + 3] = np.concatenate(
-            (x_temp.reshape(-1, 1), y_temp.reshape(-1, 1), x_zyl_R_y[:index_1dot5_y, 2].reshape(-1, 1)), axis=1)
+        #z_offset = x_zyl_R_y[:, 2].min()
+        #x_zyl_R_y[:, 2] = x_zyl_R_y[:, 2] - z_offset
+        #x_temp, y_temp = pol2cart(x_zyl_R_y[:index_1dot5_y, 0], x_zyl_R_y[:index_1dot5_y, 1])
+        #x_1dot5_y[:, i * 3:i * 3 + 3] = np.concatenate(
+        #    (x_temp.reshape(-1, 1), y_temp.reshape(-1, 1), x_zyl_R_y[:index_1dot5_y, 2].reshape(-1, 1)), axis=1)
 
     ## revovle for spherical/biconical fit
     # rot_angle = 5 / 180 * np.pi
@@ -189,24 +188,26 @@ for k in dir:
     R_n_x = R_n_x[~np.isnan(R_n_x).any(axis=1)]
     R_n_y = R_n_y[~np.isnan(R_n_y).any(axis=1)]
 
-    if k < 10:
-        label_name = str(l_name[kk_])
 
-        ax00.plot(t_plot/3600, power_eye - power_eye[0], label=label_name)
-        # ax00.plot(t_plot/3600, power_eye_x - power_eye_x[0], label=label_name+'R_x')
-        # ax00.plot(t_plot/3600, power_eye_y - power_eye_y[0], label=label_name+'R_y')
-        leg = ax00.legend(loc='lower right', fontsize=9)
-        ax00.set_xlabel('time [h]', Fontsize=12)
-        ax00.set_ylabel('refractive power change [D]', Fontsize=12)
-        # plt.ylim([-3, 0])
-        plt.xticks((np.arange(0, 20, 2)))
-        ax3.scatter([kk_], thickness_central[kk_] * 1e3, label='central epithelium'+label_name[kk_])
-        ax3.scatter([kk_], thickness_midperi[kk_] * 1e3, label='mid-peripheral epithelium'+label_name[kk_])
-        ax3.set_ylabel('epithelial thickness [$\mu m$]', Fontsize=12)
-        leg = ax3.legend(loc='lower right', fontsize=9)
-        plt.xticks((np.arange(0, 4, 0.25)))
+    label_name = str(l_name[0])
+
+    ax00.plot(t_plot/3600, power_eye - power_eye[0], label=label_name+k)
+    # ax00.plot(t_plot/3600, power_eye_x - power_eye_x[0], label=label_name+'R_x')
+    # ax00.plot(t_plot/3600, power_eye_y - power_eye_y[0], label=label_name+'R_y')
+    leg = ax00.legend(loc='lower right', fontsize=9)
+    ax00.set_xlabel('time [h]', Fontsize=12)
+    ax00.set_ylabel('refractive power change [D]', Fontsize=12)
+    # plt.ylim([-3, 0])
+    plt.xticks((np.arange(0, 20, 2)))
+    ax3.scatter([kk_], thickness_central[kk_] * 1e3, label='central epithelium'+label_name[kk_])
+    ax3.scatter([kk_], thickness_midperi[kk_] * 1e3, label='mid-peripheral epithelium'+label_name[kk_])
+    ax3.set_ylabel('epithelial thickness [$\mu m$]', Fontsize=12)
+    leg = ax3.legend(loc='lower right', fontsize=9)
+    plt.xticks((np.arange(0, 4, 0.25)))
+
     kk_ += 1
 
+n = 1.3375
 r_x = np.zeros([6, 1])
 r_y = np.zeros([6, 1])
 r_x[:, 0] = [(7.43), (7.65), (7.58), (7.55), (7.56), (7.56)]
