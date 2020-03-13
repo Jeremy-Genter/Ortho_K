@@ -12,18 +12,18 @@ nodes_disp_file = ['anterior_surface.dat']
 fig00, ax00 = plt.subplots()
 fig00.suptitle('Refractive Correction: Patient 3', fontsize=16)
 
-fig3, ax3 = plt.subplots()
-fig3.suptitle('Change in Epithelial Thickness', fontsize=16)
+#fig3, ax3 = plt.subplots()
+#fig3.suptitle('Change in Epithelial Thickness', fontsize=16)
 
 
 section = ['<Nodes name="Cornea"', '<NodeSet name="anterior_surface">', '<NodeSet name="anterior_surface_stroma">',
            '<NodeSet name="posterior_surface">']
 
-E_epi = np.asarray([0.8, 0.8])
-k_epi = np.round(np.logspace(-6.5, -5.2, 5), 8)
-k_stroma = np.round(np.logspace(-3.4, -2.3, 5), 5)
-l_name = np.ndarray.tolist(E_epi) + np.ndarray.tolist(k_epi) + np.ndarray.tolist(k_stroma)
-l_name = ['E: 1.5 kPa; $k_{epi}$: 7.5e-6 $\dfrac{mm^4}{Ns}$; k_stroma:$k_{stroma}$: 2.66e-3 $\dfrac{mm^4}{Ns}$ left']
+#E_epi = np.asarray([0.8, 0.8])
+#k_epi = np.round(np.logspace(-6.5, -5.2, 5), 8)
+#k_stroma = np.round(np.logspace(-3.4, -2.3, 5), 5)
+#l_name = np.ndarray.tolist(E_epi) + np.ndarray.tolist(k_epi) + np.ndarray.tolist(k_stroma)
+#l_name = ['E: 1.5 kPa; $k_{epi}$: 7.5e-6 $\dfrac{mm^4}{Ns}$; k_stroma:$k_{stroma}$: 2.66e-3 $\dfrac{mm^4}{Ns}$ left']
 l_name = ['Patient 3 OD']
 folder = 'Patient_3_OD'
 # l_name = np.ndarray.tolist(E_epi) + ['$p_{eyelid}=1\,kPa$ $E_{epi} = 4$', 'sealed Boundary']
@@ -31,8 +31,8 @@ os.chdir(folder)
 dir = os.listdir(os.getcwd())
 os.chdir('..')
 
-thickness_central = np.zeros([len(dir), 1])
-thickness_midperi = np.zeros([len(dir), 1])
+#thickness_central = np.zeros([len(dir), 1])
+#thickness_midperi = np.zeros([len(dir), 1])
 kk_ = 0
 for k in dir:
     if os.path.isfile(os.path.join(folder, k, 'anterior_surface.dat')) == 0:
@@ -81,16 +81,16 @@ for k in dir:
         #    ii += 1
         iii += 1
 
-    iii = np.abs(t-16*3600).argmin()
-    iii_control = np.abs(t-64).argmin()
-    thickness_central_temp = x[np.abs(x[:, iii*3]-0.02).argmin(), iii*3:(iii + 1) * 3] - x_an_str[np.abs(x_an_str[:, iii*3]-0.02).argmin(), iii*3:(iii + 1) * 3]
-    thickness_central_temp_con = x[np.abs(x[:, iii_control * 3] - 0.02).argmin(), iii_control * 3:(iii_control + 1) * 3]\
-                                 - x_an_str[np.abs(x_an_str[:, iii_control * 3] - 0.02).argmin(), iii_control * 3:(iii_control + 1) * 3]
-    thickness_central[kk_] = np.linalg.norm(thickness_central_temp)-np.linalg.norm(thickness_central_temp_con)
-    thickness_midperi_temp = x[np.abs(x[:, iii*3]-3).argmin(), iii*3:(iii + 1) * 3] - x_an_str[np.abs(x_an_str[:, iii*3]-2.97).argmin(), iii*3:(iii + 1) * 3]
-    thickness_midperi_temp_con = x[np.abs(x[:, iii_control*3]-3).argmin(), iii_control*3:(iii_control + 1) * 3]\
-                                 - x_an_str[np.abs(x_an_str[:, iii_control*3]-2.97).argmin(), iii_control*3:(iii_control + 1) * 3]
-    thickness_midperi[kk_] = np.linalg.norm(thickness_midperi_temp)-np.linalg.norm(thickness_midperi_temp_con)
+    #iii = np.abs(t-16*3600).argmin()
+    #iii_control = np.abs(t-64).argmin()
+    #thickness_central_temp = x[np.abs(x[:, iii*3]-0.02).argmin(), iii*3:(iii + 1) * 3] - x_an_str[np.abs(x_an_str[:, iii*3]-0.02).argmin(), iii*3:(iii + 1) * 3]
+    #thickness_central_temp_con = x[np.abs(x[:, iii_control * 3] - 0.02).argmin(), iii_control * 3:(iii_control + 1) * 3]\
+    #                             - x_an_str[np.abs(x_an_str[:, iii_control * 3] - 0.02).argmin(), iii_control * 3:(iii_control + 1) * 3]
+    #thickness_central[kk_] = np.linalg.norm(thickness_central_temp)-np.linalg.norm(thickness_central_temp_con)
+    #thickness_midperi_temp = x[np.abs(x[:, iii*3]-3).argmin(), iii*3:(iii + 1) * 3] - x_an_str[np.abs(x_an_str[:, iii*3]-2.97).argmin(), iii*3:(iii + 1) * 3]
+    #thickness_midperi_temp_con = x[np.abs(x[:, iii_control*3]-3).argmin(), iii_control*3:(iii_control + 1) * 3]\
+    #                             - x_an_str[np.abs(x_an_str[:, iii_control*3]-2.97).argmin(), iii_control*3:(iii_control + 1) * 3]
+    #thickness_midperi[kk_] = np.linalg.norm(thickness_midperi_temp)-np.linalg.norm(thickness_midperi_temp_con)
     for i in range(len(t)):
         r_temp, phi_temp = cart2pol(x[:, i*3], x[:, i*3+1])
         x_zyl = np.concatenate((r_temp.reshape(-1, 1), phi_temp.reshape(-1, 1), x[:, i*3+2].reshape(-1, 1)), axis=1)
@@ -199,11 +199,11 @@ for k in dir:
     ax00.set_ylabel('refractive power change [D]', Fontsize=12)
     # plt.ylim([-3, 0])
     plt.xticks((np.arange(0, 20, 2)))
-    ax3.scatter([kk_], thickness_central[kk_] * 1e3, label='central epithelium'+label_name[kk_])
-    ax3.scatter([kk_], thickness_midperi[kk_] * 1e3, label='mid-peripheral epithelium'+label_name[kk_])
-    ax3.set_ylabel('epithelial thickness [$\mu m$]', Fontsize=12)
-    leg = ax3.legend(loc='lower right', fontsize=9)
-    plt.xticks((np.arange(0, 4, 0.25)))
+    #ax3.scatter([kk_], thickness_central[kk_] * 1e3, label='central epithelium'+label_name[kk_])
+    #ax3.scatter([kk_], thickness_midperi[kk_] * 1e3, label='mid-peripheral epithelium'+label_name[kk_])
+    #ax3.set_ylabel('epithelial thickness [$\mu m$]', Fontsize=12)
+    #leg = ax3.legend(loc='lower right', fontsize=9)
+    #plt.xticks((np.arange(0, 4, 0.25)))
 
     kk_ += 1
 

@@ -14,17 +14,18 @@ folders = ['Patient_3/pre/', 'Patient_3/lens_out/', 'Patient_3/20min/', 'Patient
 file_names = ['ELE_OD.CSV', 'ELE_OS.CSV', 'PAC_OD.CSV', 'PAC_OS.CSV']
 
 fig1, axs1 = plt.subplots(6, 2)
+fig1.subplots_adjust(top=0.925, wspace=0.1, hspace=0.5)
 fig1.suptitle('Right Eye Patient 3', fontsize=16)
 t_meas = np.asarray([0, 8*3600, (8+36/60)*3600, (8+53/60)*3600, (8+80/60)*360, (8+4+23/60)*3600])+64
 n = 1.3375
 
-dir_list = ['Patient_3_OD/initial_parameters/dir10']  # os.listdir(os.getcwd())
+dir_list = ['Patient_3_OD/dir02']  # os.listdir(os.getcwd())
 
 rho_new = np.linspace(-6, 6, 40)
 phi_new = np.linspace(0, 2*np.pi, 15)
 rho_new, phi_new = np.meshgrid(rho_new, phi_new)
 grid_x, grid_y = pol2cart(rho_new, phi_new)
-levels = np.linspace(35, 60, 150)
+levels = np.linspace(35, 55, 150)
 
 for k in dir_list:
 
@@ -54,12 +55,6 @@ for k in dir_list:
     for time in t_meas:
         t_index = np.argmin(np.abs(t - time))
         pos = x_tot[:, t_index * 3:(t_index + 1) * 3]
-        pos_2 = deepcopy(pos)
-        pos_2[:, 1] = -pos_2[:, 1]
-        pos = np.concatenate((pos, pos_2), axis=0)
-        pos_2 = deepcopy(pos)
-        pos_2[:, 0] = -pos_2[:, 0]
-        pos = np.concatenate((pos, pos_2), axis=0)
 
         x = pos[:, 0]
         y = pos[:, 1]
@@ -93,7 +88,8 @@ for k in dir_list:
 
         CS = axs1[kk_, 0].contourf(grid_x, grid_y, ref_power, levels=levels, cmap='rainbow')
         axs1[kk_, 0].set_title(str(np.round((t_meas[kk_]-64)/3600, 2)) + 'h')
-        axs1[kk_, 0].set_xlabel('X [mm]')
+        if kk_ + 1 == len(t_meas):
+            axs1[kk_, 0].set_xlabel('X [mm]')
         axs1[kk_, 0].set_ylabel('Y [mm]')
         kk_ += 1
 
@@ -130,12 +126,12 @@ for k in dir_list:
 
 
         CS = axs1[kk_, 1].contourf(grid_x, grid_y, ref_power, levels=levels, cmap='rainbow')
-        if kk_ == len(t_meas):
+        if kk_+1 == len(t_meas):
             cbar = fig1.colorbar(CS, ax=axs1[kk_, 1])
             cbar.ax.set_ylabel('refractive power [D]')
+            axs1[kk_, 1].set_xlabel('X [mm]')
         axs1[kk_, 1].set_title(str(np.round((t_meas[kk_]-64)/3600, 2)) + 'h')
-        axs1[kk_, 1].set_xlabel('X [mm]')
-        axs1[kk_, 1].set_ylabel('Y [mm]')
+
 
         kk_ += 1
 
